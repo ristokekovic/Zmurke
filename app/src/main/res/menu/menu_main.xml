@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <item android:id="@+id/show_map_title" android:title="@string/show_map"
+        android:orderInCategory="100" app:showAsAction="ifRoom" android:icon="@drawable/ic_action_map"/>
+    <item android:id="@+id/new_place_item" android:title="@string/new_place"
+        android:orderInCategory="100" app:showAsAction="ifRoom" android:icon="@drawable/ic_action_new" />
+    <item android:id="@+id/server_list_item" android:title="@string/server_list"
+        android:orderInCategory="100" app:showAsAction="ifRoom" android:icon="@drawable/ic_action_download" />
+    <item android:id="@+id/my_places_list_item" android:title="@string/my_places_list"
+        android:orderInCategory="100" app:showAsAction="never" android:icon="@drawable/ic_action_view_as_list" />
+    <item android:id="@+id/about_item" android:title="@string/about"
+        android:orderInCategory="100" app:showAsAction="never" android:icon="@drawable/ic_action_about" />
+
+</menu>

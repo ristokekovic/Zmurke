@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">MyPlaces</string>
+    <string name="show_map">Show Map</string>
+    <string name="new_place">New Place</string>
+    <string name="my_places_list">My Places</string>
+    <string name="about">About</string>
+    <string name="about_text">
+        <i>My Places</i> is an Android app for keeping track of all the user\'s favourite places! It will help you remember characteristics and locations of the places you love!
+        You can bookmark your favourite bar, hotel or a community park in your hometown and every city that you visit, so that you know where to go next time you are in that place or you can recommend them to your friends.
+        With MyPlaces you never have to remember that stuff anymore! <i>We do that for you!</i>
+    </string>
+    <string name="ok">OK</string>
+    <string name="title_activity_my_places_list">MyPlacesList</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_edit_my_place">EditMyPlaceActivity</string>
+    <string name="editmyplace_name_label">Name:</string>
+    <string name="editmyplace_desc_label">Description:</string>
+    <string name="editmyplace_lat_label">Latitude:</string>
+    <string name="editmyplace_lon_label">Longitude:</string>
+    <string name="editmyplace_location_label">Get location</string>
+    <string name="editmyplace_save_label">Save</string>
+    <string name="editmyplace_cancel_label">Cancel</string>
+    <string name="viewmyplace_finished_label">OK</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_my_places_map">Map</string>
+    <string name="myplaces_serverlist">Places available on server</string>
+    <string name="serverlist_done_label">Done</string>
+    <string name="server_list">Get Server List</string>
+</resources>
