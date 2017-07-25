@@ -36,14 +36,20 @@ public class MainActivity extends AppCompatActivity {
             case R.id.show_map_title:
                 msg = getString(R.string.show_map);
                 Intent map = new Intent(this, MyPlacesMapActivity.class);
-                map.putExtra("state", MyPlacesMapActivity.SHOW_MAP);
+            //    map.putExtra("state", MyPlacesMapActivity.SHOW_MAP);
                 startActivity(map);
+
+            //   Intent map = new Intent(this, Main2Activity.class);
+             //   map.putExtra("state", MyPlacesMapActivity.SHOW_MAP);
+            //    startActivity(map);
                 break;
 
             case R.id.new_place_item:
                 msg = getString(R.string.new_place);
                 Intent place = new Intent(this,EditMyPlaceActivity.class);
                 startActivityForResult(place, NEW_PLACE);
+              //  Intent place = new Intent(this,RegistrationActivity.class);
+              //  startActivityForResult(place, NEW_PLACE);
                 break;
 
             case R.id.my_places_list_item:
