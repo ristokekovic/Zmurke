@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 public class Main2Activity extends AppCompatActivity {
 
@@ -16,6 +17,9 @@ public class Main2Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+        Intent intent = getIntent();
+        String apiKey = intent.getExtras().getString("api");
+        Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
 
        // setTitle("Zmurururke");
 

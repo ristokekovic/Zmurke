@@ -49,5 +49,11 @@
     <string name="play_again">Play Again</string>
     <string name="title_activity_main2">Main2Activity</string>
 
+    <string name="all_fields">Error: You did not fill all the fields</string>
+    <string name="email_taken">Error: Account with that email already exists!</string>
+    <string name="no_account">Don\'t have an account? Sign up.</string>
+    <string name="login_error">Error: Email and/or password incorrect</string>
+
+
 
 </resources>
