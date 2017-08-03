@@ -18,76 +18,94 @@ public class Main2Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
         Intent intent = getIntent();
-        String apiKey = intent.getExtras().getString("api");
-        Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
+        final String apiKey = intent.getExtras().getString("api");
 
-       // setTitle("Zmurururke");
+        Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
+     //   DownloadManager.getInstance().setThreadWakeUp(this);
+
+
+        final Bundle extras = intent.getExtras();
 
         final Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.alpha);
-        final ImageView v = (ImageView) findViewById(R.id.imageViewMap);
-        v.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View arg0, MotionEvent arg1) {
-                v.startAnimation(animation);
 
-                Intent map = new Intent(Main2Activity.this, MyPlacesMapActivity.class);
-                startActivity(map);
-                return true;
+        final ImageView v = (ImageView) findViewById(R.id.imageViewMap);
+        v.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+                v.startAnimation(animation);
+                Intent intent = new Intent(Main2Activity.this, MyPlacesMapActivity.class);
+                startActivity(intent);
+
             }
         });
 
-
         final ImageView v1 = (ImageView) findViewById(R.id.imageViewHelp);
-        v1.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View arg0, MotionEvent arg1) {
+        v1.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
                 v1.startAnimation(animation);
-                Intent map = new Intent(Main2Activity.this, MainActivity.class);
-                startActivity(map);
-                return true;
+                Intent intent = new Intent(Main2Activity.this, MainActivity.class);
+                startActivity(intent);
+
             }
         });
 
         final ImageView v2 = (ImageView) findViewById(R.id.imageViewProfile);
-        v2.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View arg0, MotionEvent arg1) {
+        v2.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
                 v2.startAnimation(animation);
-                Intent map = new Intent(Main2Activity.this, ProfileActivity.class);
-                startActivity(map);
-                return true;
+                Intent intent = new Intent(Main2Activity.this, ProfileActivity.class);
+                intent.putExtra("api", apiKey);
+                startActivity(intent);
+
             }
         });
+
         final ImageView v3 = (ImageView) findViewById(R.id.imageViewPlay);
-        v3.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View arg0, MotionEvent arg1) {
+        v3.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
                 v3.startAnimation(animation);
-                return true;
+
             }
         });
 
         final ImageView v4 = (ImageView) findViewById(R.id.imageViewRank);
-        v4.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View arg0, MotionEvent arg1) {
+        v4.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
                 v4.startAnimation(animation);
-                return true;
+                Intent intent = new Intent(Main2Activity.this,RankingActivity.class);
+                startActivity(intent);
+
             }
         });
 
-
         final ImageView v5 = (ImageView) findViewById(R.id.imageViewFriends);
-        v5.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View arg0, MotionEvent arg1) {
+        v5.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
                 v5.startAnimation(animation);
-                return true;
+
             }
         });
     }
+//        final ImageView v4 = (ImageView) findViewById(R.id.imageViewRank);
+//        v4.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View arg0, MotionEvent arg1) {
+//                v4.startAnimation(animation);
+//                Intent map = new Intent(Main2Activity.this, RankingActivity.class);
+//                startActivity(map);
+//                return true;
+//            }
+//        });
+
+
+
 }

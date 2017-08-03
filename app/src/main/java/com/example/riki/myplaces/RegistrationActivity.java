@@ -1,18 +1,12 @@
 package com.example.riki.myplaces;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +28,7 @@ public class RegistrationActivity extends AppCompatActivity implements IThreadWa
             public void onClick(View v) {
                 EditText username = (EditText) findViewById(R.id.username);
                 String name = username.getText().toString();
-                EditText emailTxt = (EditText) findViewById(R.id.email);
+                EditText emailTxt = (EditText) findViewById(R.id.emailT);
                 String email = emailTxt.getText().toString();
                 EditText passwordTxt = (EditText) findViewById(R.id.password);
                 String password = passwordTxt.getText().toString();

@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.riki.myplaces.RankingActivity"
+    tools:layout_editor_absoluteY="81dp"
+    tools:layout_editor_absoluteX="0dp">
+
+
+    <TextView
+        android:id="@+id/no9"
+        android:layout_width="207dp"
+        android:layout_height="36dp"
+        android:text="no9"
+        android:layout_marginLeft="45dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/no8"
+        app:layout_constraintRight_toLeftOf="@+id/guideline5"
+        android:layout_marginRight="8dp"
+        app:layout_constraintHorizontal_bias="0.0" />
+
+    <TextView
+        android:id="@+id/po10"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="po10"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline5"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/po9" />
+
+    <TextView
+        android:id="@+id/no10"
+        android:layout_width="207dp"
+        android:layout_height="36dp"
+        android:layout_marginLeft="45dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="0dp"
+        android:text="TextView3"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/guideline5"
+        app:layout_constraintTop_toBottomOf="@+id/no9" />
+
+    <TextView
+        android:id="@+id/po9"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:text="po9"
+        app:layout_constraintTop_toBottomOf="@+id/po8"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline5"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginEnd="8dp" />
+
+    <TextView
+        android:id="@+id/no8"
+        android:layout_width="207dp"
+        android:layout_height="36dp"
+        android:text="no8"
+        android:layout_marginTop="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/no7"
+        app:layout_constraintRight_toLeftOf="@+id/guideline5"
+        android:layout_marginRight="0dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="1.0" />
+
+    <TextView
+        android:id="@+id/po7"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:text="po7"
+        app:layout_constraintTop_toBottomOf="@+id/po6"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline5"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginEnd="8dp" />
+
+    <TextView
+        android:id="@+id/no6"
+        android:layout_width="207dp"
+        android:layout_height="36dp"
+        android:text="no6"
+        app:layout_constraintTop_toBottomOf="@+id/no5"
+        app:layout_constraintRight_toLeftOf="@+id/guideline5"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        android:layout_marginStart="8dp" />
+
+    <TextView
+        android:id="@+id/po6"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:text="TextView8"
+        app:layout_constraintTop_toBottomOf="@+id/po5"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline5"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginEnd="8dp" />
+
+    <TextView
+        android:id="@+id/no7"
+        android:layout_width="207dp"
+        android:layout_height="36dp"
+        android:text="TextView9"
+        app:layout_constraintRight_toLeftOf="@+id/guideline5"
+        android:layout_marginRight="-2dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="0.973"
+        android:layout_marginTop="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/no6" />
+
+    <TextView
+        android:id="@+id/po8"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:text="TextView10"
+        app:layout_constraintTop_toBottomOf="@+id/po7"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline5"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginEnd="8dp" />
+
+    <TextView
+        android:id="@+id/no5"
+        android:layout_width="207dp"
+        android:layout_height="36dp"
+        android:text="TextView11"
+        app:layout_constraintTop_toBottomOf="@+id/no4"
+        app:layout_constraintRight_toLeftOf="@+id/guideline5"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        android:layout_marginStart="8dp" />
+
+    <TextView
+        android:id="@+id/po5"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:text="TextView12"
+        app:layout_constraintTop_toBottomOf="@+id/po4"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline5"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginEnd="8dp" />
+
+    <TextView
+        android:id="@+id/no4"
+        android:layout_width="207dp"
+        android:layout_height="36dp"
+        android:text="TextView13"
+        app:layout_constraintTop_toBottomOf="@+id/no3"
+        app:layout_constraintRight_toLeftOf="@+id/guideline5"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        android:layout_marginStart="8dp" />
+
+    <TextView
+        android:id="@+id/po4"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:text="TextView14"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline5"
+        app:layout_constraintTop_toBottomOf="@+id/po3"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginEnd="8dp" />
+
+    <TextView
+        android:id="@+id/no1"
+        android:layout_width="207dp"
+        android:layout_height="36dp"
+        android:text="Marija Kostic"
+        app:layout_constraintRight_toLeftOf="@+id/guideline5"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="130dp"
+        android:layout_marginStart="8dp" />
+
+    <TextView
+        android:id="@+id/po1"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:text="9292726"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline5"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="130dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginEnd="8dp" />
+
+    <TextView
+        android:id="@+id/no3"
+        android:layout_width="207dp"
+        android:layout_height="36dp"
+        android:text="Cak Noris"
+        app:layout_constraintRight_toLeftOf="@+id/guideline5"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintTop_toBottomOf="@+id/no2"
+        android:layout_marginStart="8dp" />
+
+    <TextView
+        android:id="@+id/po3"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:text="8875"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline5"
+        app:layout_constraintTop_toBottomOf="@+id/po2"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginEnd="8dp" />
+
+    <ImageView
+        android:id="@+id/imageView9"
+        android:layout_width="98dp"
+        android:layout_height="97dp"
+        app:srcCompat="@drawable/trophy"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="16dp"
+        app:layout_constraintRight_toLeftOf="@+id/textView22"
+        app:layout_constraintLeft_toRightOf="@+id/textView21" />
+
+    <TextView
+        android:id="@+id/textView21"
+        android:layout_width="117dp"
+        android:layout_height="37dp"
+        android:text="Player"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="52dp"
+        android:layout_marginLeft="8dp"
+        android:gravity="center"
+        android:textColor="@color/colorBlack"
+        android:textSize="28dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/imageView9"
+        android:layout_marginRight="8dp"
+        app:layout_constraintHorizontal_bias="1.0"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
+
+    <TextView
+        android:id="@+id/textView22"
+        android:layout_width="120dp"
+        android:layout_height="37dp"
+        android:textSize="28dp"
+        android:text="Points"
+        android:gravity="center"
+        android:textColor="@color/colorBlack"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="52dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/imageView9"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintHorizontal_bias="0.111"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
+
+    <TextView
+        android:id="@+id/no2"
+        android:layout_width="207dp"
+        android:layout_height="36dp"
+        android:text="Vladislav Lazic"
+        app:layout_constraintRight_toLeftOf="@+id/guideline5"
+        app:layout_constraintTop_toBottomOf="@+id/no1"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        android:layout_marginStart="8dp" />
+
+    <TextView
+        android:id="@+id/po2"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:text="82936"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline5"
+        app:layout_constraintTop_toBottomOf="@+id/po1"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginEnd="8dp" />
+
+    <android.support.constraint.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideline5"
+        app:layout_constraintGuide_begin="252dp"
+        android:orientation="vertical" />
+
+</android.support.constraint.ConstraintLayout>

@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/poz"
+    android:background="@drawable/ok"
     tools:context="com.example.riki.myplaces.LoginActivity">
 
     <EditText
         android:id="@+id/editText"
         android:textColor="@color/colorWhite"
-        android:textColorHint="@color/colorWhite"
+        android:textColorHint="@color/slova"
         app:backgroundTint="@color/colorWhite"
         android:layout_width="267dp"
         android:layout_height="39dp"
@@ -29,7 +29,7 @@
         android:layout_height="39dp"
         android:ems="10"
         android:textColor="@color/colorWhite"
-        android:textColorHint="@color/colorWhite"
+        android:textColorHint="@color/slova"
         app:backgroundTint="@color/colorWhite"
         android:hint= "password"
         android:inputType="textPassword"
@@ -41,7 +41,6 @@
     <Button
         style="@style/Widget.AppCompat.Button.Colored"
         android:textColor="@color/colorWhite"
-        app:backgroundTint="@color/colorGrey"
         android:alpha="0.889"
         android:id="@+id/button2"
         android:layout_width="wrap_content"
@@ -59,7 +58,7 @@
         android:alpha="0.8"
         android:id="@+id/button3"
         android:layout_width="385dp"
-        android:layout_height="46dp"
+        android:layout_height="48dp"
         android:text="@string/no_account"
         android:layout_marginBottom="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -99,14 +98,15 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="329dp"
-        android:layout_height="103dp"
+        android:layout_width="346dp"
+        android:layout_height="109dp"
         app:srcCompat="@drawable/ezes"
         android:layout_marginTop="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.509" />
+        app:layout_constraintHorizontal_bias="0.509"
+        tools:layout_editor_absoluteX="11dp" />
 
 
 </android.support.constraint.ConstraintLayout>
