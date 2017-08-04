@@ -78,11 +78,13 @@
         </activity>
         <activity
             android:name=".ProfileActivity"
-            android:label="Your profile" />
-        <activity android:name=".PasswordActivity" />
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+        <activity android:name=".PasswordActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
         <activity
             android:name=".RankingActivity"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+            />
+        <activity android:name=".FriendsActivity"></activity>
     </application>
 
 </manifest>

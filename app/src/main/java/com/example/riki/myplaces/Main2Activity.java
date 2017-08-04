@@ -25,7 +25,6 @@ public class Main2Activity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
-     //   DownloadManager.getInstance().setThreadWakeUp(this);
 
 
         final Bundle extras = intent.getExtras();
@@ -94,6 +93,7 @@ public class Main2Activity extends AppCompatActivity {
 
             }
         });
+        
     }
 //        final ImageView v4 = (ImageView) findViewById(R.id.imageViewRank);
 //        v4.setOnTouchListener(new View.OnTouchListener() {

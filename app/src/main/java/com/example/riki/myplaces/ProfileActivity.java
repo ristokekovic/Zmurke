@@ -4,10 +4,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -18,20 +22,32 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+
 public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp{
 
+    boolean updated = false;
     final int PICK_IMAGE = 100;
-    EditText firstname,lastname,username1,phone, email1;
+    EditText firstname,lastname,username1, email1, phone;
+    String firstn, lastn, phonen;
+    String apiKey;
+    String encodedImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         Intent intent = getIntent();
-        String apiKey = intent.getExtras().getString("api");
+        apiKey = intent.getExtras().getString("api");
         Bundle extras = intent.getExtras();
+        encodedImage = "";
 
         DownloadManager.getInstance().setThreadWakeUp(this);
+
+        firstname = (EditText) findViewById(R.id.firstnameT);
+        lastname = (EditText) findViewById(R.id.lastnameT);
+        phone = (EditText) findViewById(R.id.phoneT);
+
 
         if (apiKey != null) {
 
@@ -69,8 +85,38 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
             }
         });
 
+        final ImageView iw1 = (ImageView) findViewById(R.id.cancelButton1);
+        iw1.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+
+                finish();
+
+            }
+        });
+
+        final ImageView iw2= (ImageView) findViewById(R.id.checkButton1);
+        iw2.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+
+                if (apiKey != null) {
+
+                    updated = true;
+                    firstn = firstname.getText().toString();
+                    lastn = lastname.getText().toString();
+                    phonen = phone.getText().toString();
+
+                    DownloadManager.getInstance().update(firstn,lastn,phonen,encodedImage,apiKey);
+
+                }
+
+            }
+        });
 
     }
+
+
 
      @Override
     protected void onActivityResult(int requestCode, int resultCode,
@@ -93,9 +139,17 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
 
                     final ImageView button = (ImageView) findViewById(R.id.slika);
                     Bitmap yourSelectedImage = BitmapFactory.decodeFile(filePath);
+
+//                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                    yourSelectedImage.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
+//                    byte[] b = baos.toByteArray();
+//
+//                    encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
+
                     button.setImageBitmap(yourSelectedImage);
                     final TextView tx = (TextView) findViewById(R.id.textView4);
                     tx.setVisibility(View.INVISIBLE);
+
                 }
         }
     }
@@ -131,38 +185,50 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
                     @Override
                     public void run() {
                         //stuff that updates ui
-                        try{
-                            JSONObject reader = new JSONObject(s);
-                            String email = reader.getString("email");
-                            String username = reader.getString("name");
-                            String firstName = reader.getString("first_name");
-                            String lastName = reader.getString("last_name");
-                            String phoneNumber = reader.getString("phone_number");
-                            String imgBase64 = reader.getString("avatar");
-                            firstname = (EditText) findViewById(R.id.firstnameT);
-                            if(firstName != "null")
-                                firstname.setText(firstName);
-                            else
-                                firstname.setText("");
 
-                            lastname = (EditText) findViewById(R.id.lastnameT);
-                            if(lastName != "null")
-                                lastname.setText(lastName);
-                            else
-                                lastname.setText("");
+                        if(updated){
 
-                            phone = (EditText) findViewById(R.id.phoneT);
-                            if(phoneNumber != "null")
-                                phone.setText(phoneNumber);
-                            else
-                                phone.setText("");
-                            email1 = (EditText) findViewById(R.id.emailT);
-                            email1.setText(email);
-                            username1 = (EditText) findViewById(R.id.usernameT);
-                            username1.setText(username);
+                            Toast.makeText(ProfileActivity.this, "Profile succesfully updated.", Toast.LENGTH_SHORT).show();
+                            updated = false;
 
-                        } catch (JSONException e){
-                            e.printStackTrace();
+                        }
+
+                        else {
+
+                            try {
+                                JSONObject reader = new JSONObject(s);
+                                String email = reader.getString("email");
+                                String username = reader.getString("name");
+                                String firstName = reader.getString("first_name");
+                                String lastName = reader.getString("last_name");
+                                String phoneNumber = reader.getString("phone_number");
+                                String imgBase64 = reader.getString("avatar");
+                                firstname = (EditText) findViewById(R.id.firstnameT);
+                                if (firstName != "null")
+                                    firstname.setText(firstName);
+                                else
+                                    firstname.setText("");
+
+                                lastname = (EditText) findViewById(R.id.lastnameT);
+                                if (lastName != "null")
+                                    lastname.setText(lastName);
+                                else
+                                    lastname.setText("");
+
+                                phone = (EditText) findViewById(R.id.phoneT);
+                                if (phoneNumber != "null")
+                                    phone.setText(phoneNumber);
+                                else
+                                    phone.setText("");
+                                email1 = (EditText) findViewById(R.id.emailT);
+                                email1.setText(email);
+                                username1 = (EditText) findViewById(R.id.usernameT);
+                                username1.setText(username);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
                         }
 
                     }

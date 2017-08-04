@@ -107,6 +107,38 @@ public class DownloadManager {
         t.start();
     }
 
+
+    public void update(final String firstname, final String lastname,final String phone, final String photo, final String apiToken)
+    {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    RequestBody formBody = new FormBody.Builder()
+                            .add("first_name", firstname)
+                            .add("last_name", lastname)
+                            .add("phone_number",phone)
+                            .add("avatar",photo)
+                            .build();
+                    Request request = new Request.Builder()
+                            .url("https://zmurke.herokuapp.com/api/update")
+                            .post(formBody)
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
     public void setThreadWakeUp(IThreadWakeUp i)
     {
         wakeUp = i;

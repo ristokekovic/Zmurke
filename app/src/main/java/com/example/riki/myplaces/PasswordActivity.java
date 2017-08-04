@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 public class PasswordActivity extends AppCompatActivity {
 
@@ -14,12 +15,12 @@ public class PasswordActivity extends AppCompatActivity {
         setContentView(R.layout.activity_password);
         setTitle("Change password");
 
-        final Button button1 = (Button) findViewById(R.id.buttonCancel);
+        final ImageView button1 = (ImageView) findViewById(R.id.cancelButton);
         button1.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
 
-               finish();
+                finish();
 
             }
         });
