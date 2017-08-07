@@ -139,6 +139,169 @@ public class DownloadManager {
         t.start();
     }
 
+    public void getFriends(final String apiToken)
+    {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Request request = new Request.Builder()
+                            .url("https://zmurke.herokuapp.com/api/user/friends")
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+    public void addFriend(final int friendId, final String apiToken)
+    {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    RequestBody formBody = new FormBody.Builder()
+                            .add("friend_id", String.valueOf(friendId))
+                            .build();
+                    Request request = new Request.Builder()
+                            .url("https://zmurke.herokuapp.com/api/user/friends")
+                            .post(formBody)
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+    public void getLocation(int id, final String apiToken)
+    {
+        final String url = "https://zmurke.herokuapp.com/api/user/" + id + "/location";
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Request request = new Request.Builder()
+                            .url(url)
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+    public void addLocation(final float latitude, final float longitude, final String apiToken)
+    {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    RequestBody formBody = new FormBody.Builder()
+                            .add("latitude", String.valueOf(latitude))
+                            .add("longitude", String.valueOf(longitude))
+                            .build();
+                    Request request = new Request.Builder()
+                            .url("https://zmurke.herokuapp.com/api/location")
+                            .post(formBody)
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+    public void createGame(final int numberOfPlayers, final int timeLimit, final int[] players, final String apiToken)
+    {
+        String playersString = "";
+        for(int i = 0; i < players.length; i++)
+            playersString += String.valueOf(players[i]) + ",";
+        final String playrs = playersString;
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    RequestBody formBody = new FormBody.Builder()
+                            .add("number_of_players", String.valueOf(numberOfPlayers))
+                            .add("time_limit", String.valueOf(timeLimit))
+                            .add("players", playrs)
+                            .build();
+                    Request request = new Request.Builder()
+                            .url("https://zmurke.herokuapp.com/api/game")
+                            .post(formBody)
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+    public void getGame(final String apiToken)
+    {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Request request = new Request.Builder()
+                            .url("https://zmurke.herokuapp.com/api/players")
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+    public void getPlayers(final String apiToken)
+    {
+
+    }
+
     public void setThreadWakeUp(IThreadWakeUp i)
     {
         wakeUp = i;

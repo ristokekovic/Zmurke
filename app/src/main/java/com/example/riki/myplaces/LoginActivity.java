@@ -1,7 +1,14 @@
 package com.example.riki.myplaces;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -24,13 +31,49 @@ public class LoginActivity extends AppCompatActivity implements IThreadWakeUp {
         setContentView(R.layout.activity_login);
         DownloadManager.getInstance().setThreadWakeUp(this);
 
+        ConstraintLayout constraintLayout = (ConstraintLayout) findViewById(R.id.constraint_layout);
+
+        SharedPreferences app_preferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Get the value for the run counter
+        String apiKey = app_preferences.getString("api_key", "DEFAULT");
+        if(!apiKey.equals("DEFAULT")){
+            Intent intent = new Intent(LoginActivity.this, Main2Activity.class);
+            intent.putExtra("api", apiKey);
+            intent.putExtra("remembered", true);
+            startActivity(intent);
+        }
+
+
+        boolean connected = false;
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            connected = true;
+        }
+        else
+            connected = false;
+
+        if(!connected){
+            Snackbar snackbar = Snackbar
+                    .make(constraintLayout, getString(R.string.no_internet), Snackbar.LENGTH_INDEFINITE);
+
+            snackbar.show();
+
+            Button login = (Button) findViewById(R.id.button2);
+            login.setEnabled(false);
+
+        }
+
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         if (extras != null) {
             String email = intent.getExtras().getString("email");
             emailTxt = (EditText) findViewById(R.id.editText);
             emailTxt.setText(email);
-            Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.registration_successful), Toast.LENGTH_SHORT).show();
         }
 
         final Button button1 = (Button) findViewById(R.id.button2);
@@ -105,6 +148,14 @@ public class LoginActivity extends AppCompatActivity implements IThreadWakeUp {
             else {
                 Intent intent = new Intent(LoginActivity.this, Main2Activity.class);
                 intent.putExtra("api", s);
+
+                //saving user to persistent storage, in order to remember the user for future automated logins
+                SharedPreferences app_preferences =
+                        PreferenceManager.getDefaultSharedPreferences(this);
+
+                SharedPreferences.Editor editor = app_preferences.edit();
+                editor.putString("api_key", s);
+                editor.apply(); // Very important
                 startActivity(intent);
             }
         }

@@ -54,5 +54,8 @@
     <string name="no_account">Don\'t have an account? Sign up.</string>
     <string name="login_error">Error: Email and/or password incorrect</string>
 
+    <string name="no_internet">No internet connection</string>
+    <string name="registration_successful">Registration successful!</string>
+
 
 </resources>
