@@ -4,22 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/ok"
+    android:background="@drawable/moja"
     android:id="@+id/constraint_layout"
     tools:context="com.example.riki.myplaces.LoginActivity">
 
     <EditText
         android:id="@+id/editText"
-        android:textColor="@color/colorWhite"
-        android:textColorHint="@color/slova"
-        app:backgroundTint="@color/colorWhite"
+        android:textColor="@color/dot_dark_screen2"
+        android:textColorHint="@color/red"
+        app:backgroundTint="@color/red"
         android:layout_width="267dp"
         android:layout_height="39dp"
         android:ems="10"
         android:inputType="textEmailAddress"
         android:hint="email"
-        android:layout_marginTop="50dp"
-        app:layout_constraintTop_toBottomOf="@+id/textView3"
+        android:layout_marginTop="37dp"
+        app:layout_constraintTop_toBottomOf="@+id/error"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintHorizontal_bias="0.504" />
@@ -29,46 +29,48 @@
         android:layout_width="267dp"
         android:layout_height="39dp"
         android:ems="10"
-        android:textColor="@color/colorWhite"
-        android:textColorHint="@color/slova"
-        app:backgroundTint="@color/colorWhite"
+        android:textColor="@color/dot_dark_screen2"
+        android:textColorHint="@color/red"
+        app:backgroundTint="@color/red"
         android:hint= "password"
         android:inputType="textPassword"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="15dp"
         app:layout_constraintTop_toBottomOf="@+id/editText"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="0.504" />
 
     <Button
         style="@style/Widget.AppCompat.Button.Colored"
-        android:textColor="@color/colorWhite"
+        android:textColor="@color/background_holo_light"
+        android:background="@color/red"
         android:alpha="0.889"
         android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="189dp"
+        android:layout_height="36dp"
         android:text="Log In"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="36dp"
-        app:layout_constraintTop_toBottomOf="@+id/editText2" />
+        android:layout_marginTop="28dp"
+        app:layout_constraintTop_toBottomOf="@+id/editText2"
+        app:layout_constraintHorizontal_bias="0.502" />
 
     <Button
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:textColor="@color/colorWhite"
+        android:textColor="@color/dot_dark_screen2"
         android:color="#66FF0000"
         android:alpha="0.8"
         android:id="@+id/button3"
-        android:layout_width="385dp"
+        android:layout_width="368dp"
         android:layout_height="48dp"
         android:text="@string/no_account"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="2dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@+id/button2"
-        app:layout_constraintVertical_bias="1.0"
-        app:layout_constraintHorizontal_bias="0.0" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/textView3"
@@ -77,10 +79,11 @@
         android:text="Žmurke"
         android:textColor="@color/colorWhite"
         android:textSize="63dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="0dp"
         app:layout_constraintTop_toBottomOf="@+id/imageView"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="0.503" />
 
     <TextView
         android:id="@+id/error"
@@ -99,15 +102,22 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="346dp"
-        android:layout_height="109dp"
+        android:layout_width="366dp"
+        android:layout_height="121dp"
         app:srcCompat="@drawable/ezes"
         android:layout_marginTop="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.509"
-        tools:layout_editor_absoluteX="11dp" />
+        app:layout_constraintHorizontal_bias="0.526"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <android.support.constraint.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/guideline4"
+        app:layout_constraintGuide_begin="254dp"
+        android:orientation="horizontal" />
 
 
 </android.support.constraint.ConstraintLayout>

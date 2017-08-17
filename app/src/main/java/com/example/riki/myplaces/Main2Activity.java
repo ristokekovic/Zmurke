@@ -30,7 +30,14 @@ public class Main2Activity extends AppCompatActivity {
         final String apiKey = intent.getExtras().getString("api");
         clickEnabled = true;
 
-        if (!extras.containsKey("remembered"))
+        if (getIntent().getBooleanExtra("EXIT", false)) {
+
+            Intent intent1 = new Intent(Main2Activity.this, LoginActivity.class);
+            startActivity(intent1);
+            finish();
+        }
+
+        if (getIntent().getBooleanExtra("remembered", true))
             Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
@@ -80,6 +87,7 @@ public class Main2Activity extends AppCompatActivity {
                 Intent intent = new Intent(Main2Activity.this, MainActivity.class);
                 startActivity(intent);
 
+
             }
         });
 
@@ -91,7 +99,6 @@ public class Main2Activity extends AppCompatActivity {
                 Intent intent = new Intent(Main2Activity.this, ProfileActivity.class);
                 intent.putExtra("api", apiKey);
                 startActivity(intent);
-
             }
         });
 

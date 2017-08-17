@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -23,7 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-
+import android.content.SharedPreferences;
 public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp{
 
     boolean updated = false;
@@ -32,22 +33,23 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
     String firstn, lastn, phonen;
     String apiKey;
     String encodedImage;
+    byte[] b;
+    ImageView buttonphoto;
+    String userMail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
         apiKey = intent.getExtras().getString("api");
         Bundle extras = intent.getExtras();
         encodedImage = "";
-
         DownloadManager.getInstance().setThreadWakeUp(this);
 
         firstname = (EditText) findViewById(R.id.firstnameT);
         lastname = (EditText) findViewById(R.id.lastnameT);
         phone = (EditText) findViewById(R.id.phoneT);
-
 
         if (apiKey != null) {
 
@@ -74,18 +76,46 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
             }
         });
 
-        final Button button1 = (Button) findViewById(R.id.oldPass);
+        final Button button1 = (Button) findViewById(R.id.oldPassButton);
         button1.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
 
                 Intent intent = new Intent(ProfileActivity.this,PasswordActivity.class);
+                intent.putExtra("api", apiKey);
+                intent.putExtra("email",userMail);
                 startActivity(intent);
 
             }
         });
 
-        final ImageView iw1 = (ImageView) findViewById(R.id.cancelButton1);
+        final Button logOut = (Button) findViewById(R.id.logout);
+        logOut.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+
+
+                SharedPreferences spreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                SharedPreferences.Editor spreferencesEditor = spreferences.edit();
+                spreferencesEditor.clear();
+                spreferencesEditor.commit();
+                Toast.makeText(ProfileActivity.this, "See you soon!", Toast.LENGTH_SHORT).show();
+/*                Intent intent = new Intent(ProfileActivity.this,LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();*/
+
+
+                Intent intent1 = new Intent(getApplicationContext(), Main2Activity.class);
+                intent1.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent1.putExtra("EXIT",true);
+                intent1.putExtra("remembered", false);
+                startActivity(intent1);
+
+            }
+        });
+
+        final ImageView iw1 = (ImageView) findViewById(R.id.cancelButton);
         iw1.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
@@ -95,7 +125,7 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
             }
         });
 
-        final ImageView iw2= (ImageView) findViewById(R.id.checkButton1);
+        final ImageView iw2= (ImageView) findViewById(R.id.checkButton);
         iw2.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
@@ -137,16 +167,22 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
                     String filePath = cursor.getString(columnIndex);
                     cursor.close();
 
-                    final ImageView button = (ImageView) findViewById(R.id.slika);
+                    buttonphoto = (ImageView) findViewById(R.id.slika);
                     Bitmap yourSelectedImage = BitmapFactory.decodeFile(filePath);
 
-//                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                    yourSelectedImage.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
-//                    byte[] b = baos.toByteArray();
-//
-//                    encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
+                    Bitmap resized = Bitmap.createScaledBitmap(yourSelectedImage,(int)(yourSelectedImage.getWidth()*0.2), (int)(yourSelectedImage.getHeight()*0.2), true);
 
-                    button.setImageBitmap(yourSelectedImage);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    resized.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
+                    b = baos.toByteArray();
+
+                   encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
+
+
+                    buttonphoto.setImageBitmap(resized);
+
+                    resized.recycle();
+                  //  button.setImageBitmap(resized);
                     final TextView tx = (TextView) findViewById(R.id.textView4);
                     tx.setVisibility(View.INVISIBLE);
 
@@ -191,6 +227,7 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
                             Toast.makeText(ProfileActivity.this, "Profile succesfully updated.", Toast.LENGTH_SHORT).show();
                             updated = false;
 
+
                         }
 
                         else {
@@ -198,6 +235,7 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
                             try {
                                 JSONObject reader = new JSONObject(s);
                                 String email = reader.getString("email");
+                                userMail = email;
                                 String username = reader.getString("name");
                                 String firstName = reader.getString("first_name");
                                 String lastName = reader.getString("last_name");
@@ -220,6 +258,17 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
                                     phone.setText(phoneNumber);
                                 else
                                     phone.setText("");
+
+                                if (imgBase64 != "null")
+                                {
+
+                                   /* b = Base64.decode(imgBase64, Base64.DEFAULT);
+                                    Bitmap decodedImage = BitmapFactory.decodeByteArray(b, 0, b.length);
+                                    buttonphoto.setImageBitmap(decodedImage);*/
+
+                                }
+
+
                                 email1 = (EditText) findViewById(R.id.emailT);
                                 email1.setText(email);
                                 username1 = (EditText) findViewById(R.id.usernameT);

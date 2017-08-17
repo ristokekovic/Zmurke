@@ -19,6 +19,10 @@
     <color name="dot_dark_screen3">#2278d4</color>
     <color name="dot_dark_screen4">#a854d4</color>
     <color name="slova">#9914a895</color>
+    <color name= "regslova">#FFC107</color>
+    <color name= "pozadina">#F4511E</color>
+    <color name="background_holo_light">#fffafafa</color>
+    <color name="red">#F14F5F</color>
     <!-- dots active colors -->
     <color name="dot_light_screen1">#f98da5</color>
     <color name="dot_light_screen2">#8cf9eb</color>
