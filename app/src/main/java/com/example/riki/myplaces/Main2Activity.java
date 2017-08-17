@@ -66,6 +66,7 @@ public class Main2Activity extends AppCompatActivity {
             public void onClick(View v) {
                 v.startAnimation(animation);
                 Intent intent = new Intent(Main2Activity.this, MyPlacesMapActivity.class);
+                intent.putExtra("api", apiKey);
                 startActivity(intent);
 
             }

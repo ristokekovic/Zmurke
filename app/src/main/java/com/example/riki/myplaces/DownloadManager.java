@@ -282,7 +282,7 @@ public class DownloadManager {
             public void run() {
                 try {
                     Request request = new Request.Builder()
-                            .url("https://zmurke.herokuapp.com/api/players")
+                            .url("https://zmurke.herokuapp.com/api/game")
                             .addHeader("api", apiToken)
                             .build();
 
@@ -297,9 +297,26 @@ public class DownloadManager {
         t.start();
     }
 
-    public void getPlayers(final String apiToken)
+    public void getFriendsLocation(final String apiToken)
     {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Request request = new Request.Builder()
+                            .url("https://zmurke.herokuapp.com/api/user/friends_location")
+                            .addHeader("api", apiToken)
+                            .build();
 
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
     }
 
     public void setThreadWakeUp(IThreadWakeUp i)
