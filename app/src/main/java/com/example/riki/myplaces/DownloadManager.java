@@ -139,6 +139,37 @@ public class DownloadManager {
         t.start();
     }
 
+
+    public void updatePass(final String opass, final String npass, final String email, final String apiToken)
+    {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    RequestBody formBody = new FormBody.Builder()
+                            .add("old_password", opass)
+                            .add("new_password",npass)
+                            .add("email",email )
+                            .build();
+                    Request request = new Request.Builder()
+                            .url("https://zmurke.herokuapp.com/api/update")
+                            .post(formBody)
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
     public void getFriends(final String apiToken)
     {
         Thread t = new Thread(new Runnable() {

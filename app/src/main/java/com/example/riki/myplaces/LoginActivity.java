@@ -43,6 +43,7 @@ public class LoginActivity extends AppCompatActivity implements IThreadWakeUp {
             intent.putExtra("api", apiKey);
             intent.putExtra("remembered", true);
             startActivity(intent);
+            finish();
         }
 
 
@@ -147,6 +148,9 @@ public class LoginActivity extends AppCompatActivity implements IThreadWakeUp {
             }
             else {
                 Intent intent = new Intent(LoginActivity.this, Main2Activity.class);
+
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
                 intent.putExtra("api", s);
 
                 //saving user to persistent storage, in order to remember the user for future automated logins
@@ -157,6 +161,7 @@ public class LoginActivity extends AppCompatActivity implements IThreadWakeUp {
                 editor.putString("api_key", s);
                 editor.apply(); // Very important
                 startActivity(intent);
+                finish();
             }
         }
     }
