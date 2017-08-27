@@ -4,26 +4,30 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-import java.io.ByteArrayOutputStream;
+
 import android.content.SharedPreferences;
 public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp{
 
@@ -33,9 +37,9 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
     String firstn, lastn, phonen;
     String apiKey;
     String encodedImage;
-    byte[] b;
     ImageView buttonphoto;
     String userMail;
+    File fajl, filee;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,30 +61,30 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
 
         }
 
-        final ImageView button = (ImageView) findViewById(R.id.slika);
-        button.setOnClickListener(new View.OnClickListener() {
+       // final ImageView button = (ImageView) findViewById(R.id.slika);
+        final TextView tx = (TextView) findViewById(R.id.textView4);
+      // tx.setVisibility(View.INVISIBLE);
+
+        tx.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
 
-                Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                getIntent.setType("image/*");
-
-                Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                pickIntent.setType("image/*");
-
-                Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
-                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
-
-                startActivityForResult(chooserIntent, PICK_IMAGE);
+                Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                photoPickerIntent.setType("image/*");
+                startActivityForResult(photoPickerIntent, PICK_IMAGE);
 
             }
         });
 
+
+
+
+        final Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.alpha);
         final Button button1 = (Button) findViewById(R.id.oldPassButton);
         button1.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
-
+        button1.startAnimation(animation);
                 Intent intent = new Intent(ProfileActivity.this,PasswordActivity.class);
                 intent.putExtra("api", apiKey);
                 intent.putExtra("email",userMail);
@@ -93,17 +97,13 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
         logOut.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
-
+        logOut.startAnimation(animation);
 
                 SharedPreferences spreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 SharedPreferences.Editor spreferencesEditor = spreferences.edit();
                 spreferencesEditor.clear();
                 spreferencesEditor.commit();
                 Toast.makeText(ProfileActivity.this, "See you soon!", Toast.LENGTH_SHORT).show();
-/*                Intent intent = new Intent(ProfileActivity.this,LoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();*/
 
 
                 Intent intent1 = new Intent(getApplicationContext(), Main2Activity.class);
@@ -119,7 +119,7 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
         iw1.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
-
+        iw1.startAnimation(animation);
                 finish();
 
             }
@@ -127,9 +127,8 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
 
         final ImageView iw2= (ImageView) findViewById(R.id.checkButton);
         iw2.setOnClickListener(new View.OnClickListener() {
-
             public void onClick(View v) {
-
+        iw2.startAnimation(animation);
                 if (apiKey != null) {
 
                     updated = true;
@@ -137,7 +136,10 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
                     lastn = lastname.getText().toString();
                     phonen = phone.getText().toString();
 
-                    DownloadManager.getInstance().update(firstn,lastn,phonen,encodedImage,apiKey);
+                    if(filee != null)
+                        DownloadManager.getInstance().newUpdate(firstn,lastn,phonen,filee,apiKey);
+                    else
+                        DownloadManager.getInstance().update(firstn,lastn,phonen,apiKey);
 
                 }
 
@@ -147,8 +149,7 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
     }
 
 
-
-     @Override
+     /*@Override
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
@@ -186,9 +187,116 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
                     final TextView tx = (TextView) findViewById(R.id.textView4);
                     tx.setVisibility(View.INVISIBLE);
 
+
                 }
         }
+    }*/
+
+
+     public String getPath(Uri uri)
+     {
+         String[] projection = { MediaStore.Images.Media.DATA };
+         Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+         if (cursor == null) return null;
+         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+         cursor.moveToFirst();
+         String s=cursor.getString(column_index);
+         cursor.close();
+         return s;
+     }
+
+    @Override
+    protected void onActivityResult(int reqCode, int resultCode, Intent data) {
+        super.onActivityResult(reqCode, resultCode, data);
+        String realPath;
+        if (resultCode == RESULT_OK) {
+            try {
+
+                final Uri imageUri = data.getData();
+                filee = new File(getPath(imageUri));
+
+                final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                final Bitmap selectedImage1 = BitmapFactory.decodeStream(imageStream);
+
+                fajl = saveBitmap(selectedImage1,imageUri.getPath());
+                buttonphoto = (ImageView) findViewById(R.id.slika);
+                buttonphoto.setImageBitmap(selectedImage);
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(ProfileActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
+            }
+
+        }else {
+            Toast.makeText(ProfileActivity.this, "You haven't picked Image",Toast.LENGTH_LONG).show();
+        }
     }
+
+    private File saveBitmap(final Bitmap bitmap, final String path) {
+        File file = null;
+        file = new File(path);
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+
+                if (bitmap != null) {
+
+                    try {
+                        FileOutputStream outputStream = null;
+                        try {
+                            outputStream = new FileOutputStream(path); //here is set your file path where you want to save or also here you can set file object directly
+
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream); // bitmap is your Bitmap instance, if you want to compress it you can compress reduce percentage
+                            // PNG is a lossless format, the compression factor (100) is ignored
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            try {
+                                if (outputStream != null) {
+                                    outputStream.close();
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+            return file;
+        }
+
+
+    //klasa za ucitavanje slika sa URL-a
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
+    }
+
 
    @Override
     public void ResponseOk(final String s) //on ceka da se thread zavrsi odnosno da dobije podatke sa servera
@@ -226,7 +334,7 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
 
                             Toast.makeText(ProfileActivity.this, "Profile succesfully updated.", Toast.LENGTH_SHORT).show();
                             updated = false;
-
+                            finish();
 
                         }
 
@@ -240,7 +348,7 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
                                 String firstName = reader.getString("first_name");
                                 String lastName = reader.getString("last_name");
                                 String phoneNumber = reader.getString("phone_number");
-                                String imgBase64 = reader.getString("avatar");
+                                String urlImage = reader.getString("avatar");
                                 firstname = (EditText) findViewById(R.id.firstnameT);
                                 if (firstName != "null")
                                     firstname.setText(firstName);
@@ -259,8 +367,10 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
                                 else
                                     phone.setText("");
 
-                                if (imgBase64 != "null")
+                                if (urlImage != "null")
                                 {
+                                    new DownloadImageTask((ImageView) findViewById(R.id.slika))
+                                            .execute("https://zmurke.herokuapp.com" + urlImage);
 
                                    /* b = Base64.decode(imgBase64, Base64.DEFAULT);
                                     Bitmap decodedImage = BitmapFactory.decodeByteArray(b, 0, b.length);
@@ -289,4 +399,9 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
             }
         }
     }
+
+
+
+
+
 }

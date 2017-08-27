@@ -1,8 +1,12 @@
 package com.example.riki.myplaces;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -108,7 +112,7 @@ public class DownloadManager {
     }
 
 
-    public void update(final String firstname, final String lastname,final String phone, final String photo, final String apiToken)
+    public void update(final String firstname, final String lastname,final String phone, final String apiToken)
     {
         Thread t = new Thread(new Runnable() {
             @Override
@@ -118,7 +122,54 @@ public class DownloadManager {
                             .add("first_name", firstname)
                             .add("last_name", lastname)
                             .add("phone_number",phone)
-                            .add("avatar",photo)
+                            .build();
+                    Request request = new Request.Builder()
+                            .url("https://zmurke.herokuapp.com/api/update")
+                            .post(formBody)
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+
+   /* public void upload1(String url, File file) throws IOException {
+        RequestBody formBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(),
+                        RequestBody.create(MediaType.parse("text/plain"), file))
+                .addFormDataPart("other_field", "other_field_value")
+                .build();
+        Request request = new Request.Builder().url(url).post(formBody).build();
+        Response response = this.client.newCall(request).execute();
+    }*/
+
+
+    public void newUpdate(final String firstname, final String lastname, final String phone, final File photo, final String apiToken)
+    {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    RequestBody formBody = new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("first_name", firstname)
+                            .addFormDataPart("last_name", lastname)
+                            .addFormDataPart("phone_number",phone)
+                            .addFormDataPart("avatar", photo.getName(),
+                                    RequestBody.create(MediaType.parse("image/png"), photo))
+                            //.addFormDataPart("avatar", photo.getName(),
+                           // RequestBody.create(MediaType.parse("text/plain"), photo))
                             .build();
                     Request request = new Request.Builder()
                             .url("https://zmurke.herokuapp.com/api/update")

@@ -106,7 +106,8 @@ public class Main2Activity extends AppCompatActivity {
 
             public void onClick(View v) {
                 v3.startAnimation(animation);
-
+                Intent intent = new Intent(Main2Activity.this,PlayActivity.class);
+                startActivity(intent);
             }
         });
 
