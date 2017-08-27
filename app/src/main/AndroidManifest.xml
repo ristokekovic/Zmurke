@@ -13,6 +13,8 @@
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
     <!--
      The following two permissions are not required to use
      Google Maps Android API v2, but are recommended.
@@ -76,20 +78,28 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        
         <activity
             android:name=".ProfileActivity"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
-        <activity android:name=".PasswordActivity"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+
         <activity
-            android:name=".RankingActivity"
-            />
-        <activity android:name=".FriendsActivity"/>
+            android:name=".PasswordActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+
+        <activity android:name=".RankingActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+
+        <activity android:name=".FriendsActivity" />
+
+        <activity android:name=".PlayActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"></activity>
 
         <service
             android:name=".BackgroundService"
             android:enabled="true"
             android:exported="true"/>
+>>>>>>> MarijaGrana
     </application>
 
 </manifest>

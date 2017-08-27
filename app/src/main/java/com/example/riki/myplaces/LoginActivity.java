@@ -12,6 +12,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -76,12 +78,12 @@ public class LoginActivity extends AppCompatActivity implements IThreadWakeUp {
             emailTxt.setText(email);
             Toast.makeText(this, getString(R.string.registration_successful), Toast.LENGTH_SHORT).show();
         }
-
+        final Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.alpha);
         final Button button1 = (Button) findViewById(R.id.button2);
         button1.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
-
+            button1.startAnimation(animation);
                 emailTxt = (EditText) findViewById(R.id.editText);
                 String email = emailTxt.getText().toString();
                 EditText passwordTxt = (EditText) findViewById(R.id.editText2);

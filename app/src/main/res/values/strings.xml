@@ -57,5 +57,15 @@
     <string name="no_internet">No internet connection</string>
     <string name="registration_successful">Registration successful!</string>
 
+    <string name="time_name">Choose time limit</string>
+
+    <string-array name="time_limit">
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+        <item>15 minutes</item>
+        <item>20 minutes</item>
+        <item>30 minutes</item>
+    </string-array>
+
 
 </resources>
