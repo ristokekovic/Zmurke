@@ -1,5 +1,8 @@
 package com.example.riki.myplaces;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -8,14 +11,27 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.Toast;
 import android.Manifest;
+
+import com.google.android.gms.maps.model.LatLng;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -35,15 +51,21 @@ public class BackgroundService extends Service implements LocationListener, IThr
     private static boolean serviceRunning;
 
     private LocationManager locationManager;
+    //Different Id's will show up as different notifications
+    private int mNotificationId;
+    //Some things we only have to set the first time.
+    private boolean firstNotification = true;
+    NotificationCompat.Builder mBuilder = null;
 
     private String provider;
 
-    public static Double currentLat = null;
-    public static Double currentLon = null;
+    public static float currentLat;
+    public static float currentLon;
     public String apiKey;
-
-    private String loggedUserUid;
+    public long miliseconds;
     public static int myPoints = 0;
+
+    CountDownTimer countDownTimer;
 
     private Long timeLastNotification = 0L;
 
@@ -78,8 +100,25 @@ public class BackgroundService extends Service implements LocationListener, IThr
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG,"BackgroundService onStartCommand started");
-        int settingsGpsRefreshTime = intent.getIntExtra("settingsGpsRefreshTime", 1);
-        loggedUserUid = intent.getStringExtra("loggedUserUid");
+        int settingsGpsRefreshTime = 10;
+        apiKey = intent.getStringExtra("api");
+        miliseconds = intent.getLongExtra("miliseconds", 600000);
+
+        countDownTimer = new CountDownTimer(miliseconds, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                miliseconds = millisUntilFinished;
+                if(millisUntilFinished / 1000 == 60)
+                    showNotification(2, "One minute left!");
+
+            }
+
+            public void onFinish() {
+
+            }
+        }.start();
+
+
 
         locationManager.requestLocationUpdates(provider, settingsGpsRefreshTime *1000, 0, this); //Actual time to get a new location is a little big higher- 3s instead of 1, 6s instead 5, 12s instead 10
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -110,15 +149,19 @@ public class BackgroundService extends Service implements LocationListener, IThr
         if (isInternetAvailable() && isNetworkConnected()) {
             System.gc();    //force garbage collector
             double myNewLat, myNewLon;
-            currentLat = location.getLatitude();
-            currentLon = location.getLongitude();
+            currentLat = (float) location.getLatitude();
+            currentLon = (float) location.getLongitude();
 
             myNewLat = currentLat;
             myNewLon = currentLon;
 
-            Log.d(TAG,"New location: " + myNewLat + " " + myNewLon);
-
             //TODO: Requests for the server
+
+            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            DownloadManager.getInstance().addLocation((float)location.getLatitude(), (float)location.getLongitude(), apiKey);
+
+            DownloadManager.getInstance().getFriendsLocation(apiKey);
+
         }
     }
 
@@ -167,6 +210,113 @@ public class BackgroundService extends Service implements LocationListener, IThr
 
     @Override
     public void ResponseOk(String s) {
+        if(s.isEmpty())
+        {
+            //nije dobio podatke, treba uraditi nesto
+            //treba probati jos jednom da se pribave podaci, ako je doslo do greske, ponovo se poziva DownloadManager.getData
+            //ako nije ni tada, onda treba nekako obezbediti da ne pukne aplikacija
+            //ispisati poruku da je doslo do greske na serveru, to samo ako 2 puta ne dobijemo nista
+            //promenljiva koja to obezbedjuje
+        }
+        else
+        {
+            String html = "<!DOCTYPE html>";
+            if(s.toLowerCase().contains(html.toLowerCase()))
+            {
+            }
+            else {
+                try {
+                    JSONArray friends = new JSONArray(s);
+                    for(int i = 0; i < friends.length(); i++)
+                    {
+                        final JSONObject friend = friends.getJSONObject(i);
+                        double latitude = friend.getDouble("latitude");
+                        double longitude = friend.getDouble("longitude");
+                        Float distanceFromMarker = distanceBetween((float)currentLat,(float)currentLon,(float)latitude, (float)longitude);
+                        if(distanceFromMarker < NOTIFY_DISTANCE) {
+                           showNotification(1, friend.getString("name") + " is " + Math.round(distanceFromMarker) + " meters away from you!");
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void showNotification(int uid,String text) {
+        vibrationAndSoundNotification();
+
+        mNotificationId = uid;
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if(firstNotification){
+            firstNotification = false;
+            mBuilder = new NotificationCompat.Builder(this)
+                    .setOnlyAlertOnce(true)
+                    .setPriority(Notification.PRIORITY_DEFAULT);
+
+            // Creates an explicit intent for an Activity in your app
+            Intent resultIntent = new Intent(this, MyPlacesMapActivity.class);
+            resultIntent.putExtra("api", apiKey);
+            resultIntent.putExtra("time_left", miliseconds);
+
+            // The stack builder object will contain an artificial back stack for the started Activity.
+            // This ensures that navigating backward from the Activity leads out of your application to the Home screen.
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+            // Adds the back stack for the Intent (but not the Intent itself)
+            stackBuilder.addParentStack(MainActivity.class);
+            // Adds the Intent that starts the Activity to the top of the stack
+            stackBuilder.addNextIntent(resultIntent);
+            PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            mBuilder.setContentIntent(resultPendingIntent);
+        }
+
+        if(uid==2){//landmark
+            mBuilder
+                    .setSmallIcon(R.drawable.crne)
+                    .setContentTitle("Time is running out!");
+        }else{//friend
+            mBuilder
+                    .setSmallIcon(R.drawable.crne)
+                    .setContentTitle("You have friends nearby!");
+        }
+
+        mBuilder.setContentText(text);
+        mNotificationManager.notify(mNotificationId, mBuilder.build());
+        System.gc(); //force garbage collector
+    }
+
+    private void vibrationAndSoundNotification() {
+        Long time = System.currentTimeMillis()/1000;
+
+        if(time-timeLastNotification>TIME_BETWEEN_NOTIFICATIONS){//notify user only every TIME_BETWEEN_NOTIFICATIONS seconds
+            timeLastNotification = time;
+
+            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            v.vibrate(500);
+
+            try {
+                Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+                r.play();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
 
     }
+
+    public static void deleteNotification(Context ctx, int notifyId) {
+        String ns = Context.NOTIFICATION_SERVICE;
+        NotificationManager nMgr = (NotificationManager) ctx.getSystemService(ns);
+        nMgr.cancel(notifyId);
+    }
+
+    public long getMiliseconds(){
+        return this.miliseconds;
+    }
+
+
+
 }

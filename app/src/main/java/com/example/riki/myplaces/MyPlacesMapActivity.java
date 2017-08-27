@@ -1,17 +1,21 @@
 package com.example.riki.myplaces;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -21,6 +25,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,9 +33,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,6 +48,7 @@ import java.net.URL;
 import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MyPlacesMapActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener, IThreadWakeUp {
 
@@ -47,15 +56,26 @@ public class MyPlacesMapActivity extends AppCompatActivity implements OnMapReady
     public static final int CENTER_PLACE_ON_MAP = 1;
     public static final int SELECT_COORDINATES = 2;
 
+    private static final int NOTIFY_DISTANCE = 500;
+    private static int EARTH_RADIUS = 6371000;
+
+    private static boolean settingsBackgroundService;
+
     private boolean selCoorsEnabled = false;
     private LatLng placeLoc;
     public String apiKey;
+
 
     GoogleMap map;
     LocationManager locationManager;
     int state = 0;
     int timer = 0;
     Bitmap bmp;
+    public int iterator;
+    private TextView countdown;
+    private Intent backgroundService;
+    private long miliseconds;
+    CountDownTimer countDownTimer;
 
     private HashMap<Marker, Integer> markerPlaceIdMap;
 
@@ -63,10 +83,45 @@ public class MyPlacesMapActivity extends AppCompatActivity implements OnMapReady
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //to use network operations in main thread (BackgroundService)
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         setContentView(R.layout.activity_my_places_map);
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
+
+        iterator = 0;
+        miliseconds = 65000;
+
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        apiKey = intent.getExtras().getString("api");
+        if (extras.containsKey("time_left")) {
+            miliseconds = intent.getExtras().getLong("time_left");
+        }
+
+        countdown = (TextView) findViewById(R.id.timer);
+        countDownTimer = new CountDownTimer(miliseconds, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                miliseconds = millisUntilFinished;
+                if(millisUntilFinished / 1000 > 60)
+                    countdown.setTextColor(Color.GREEN);
+                else
+                    countdown.setTextColor(Color.RED);
+                if((millisUntilFinished % 60000) / 1000 < 10)
+                    countdown.setText(millisUntilFinished / 60000 + " : 0" + (millisUntilFinished % 60000) / 1000);
+                else
+                    countdown.setText(millisUntilFinished / 60000 + " : " + (millisUntilFinished % 60000) / 1000);
+            }
+
+            public void onFinish() {
+                countdown.setText("0 : 00");
+            }
+        }.start();
 
         //  map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
 
@@ -82,8 +137,6 @@ public class MyPlacesMapActivity extends AppCompatActivity implements OnMapReady
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        Intent mapIntent = getIntent();
-        apiKey = mapIntent.getExtras().getString("api");
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
         DownloadManager.getInstance().setThreadWakeUp(this);
 
@@ -129,51 +182,72 @@ public class MyPlacesMapActivity extends AppCompatActivity implements OnMapReady
         else
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLoc, 15));
 
+
+
         state = 1;
         DownloadManager.getInstance().getFriendsLocation(apiKey);
 
     }
 
-    private void addMyPlacesMarkers(JSONArray friends){
-        //ArrayList<MyPlace> places = MyPlacesData.getInstance().getMyPlaces();
-        markerPlaceIdMap = new HashMap<Marker, Integer>((int)((double)friends.length()*1.2));
-        for(int i=0; i<friends.length(); i++)
-        {
-            try{
-                JSONObject friend = friends.getJSONObject(i);
-                String lat = friend.getString("latitude");
-                String lon = friend.getString("longitude");
-                String name = friend.getString("name");
-                String avatar = friend.getString("avatar");
+    @Override
+    protected void onPause() {
+        super.onPause();
 
-                //Float distanceFromMarker = distanceBetween((float)myNewLat,(float)myNewLon,(float)marker.getPosition().latitude, (float)marker.getPosition().longitude);
+        backgroundService = new Intent(MyPlacesMapActivity.this, BackgroundService.class);
+        backgroundService.putExtra("api", apiKey);
+        backgroundService.putExtra("miliseconds", miliseconds);
 
-                LatLng loc = new LatLng(Double.parseDouble(lat), Double.parseDouble(lon));
-                final MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(loc);
-                /*byte[] decodedString = Base64.decode(avatar, Base64.DEFAULT);
-                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(decodedByte));*/
-                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.myplace));
-                markerOptions.title(name);
-                final int iterator = i;
+        if(!isMyServiceRunning(BackgroundService.class)){
+            startService(backgroundService);
+        }
 
-                runOnUiThread(new Runnable() {
+        System.gc();
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+    }
+
+
+    private void addMarker(JSONObject friend, Bitmap bmp){
+
+        try{
+            String lat = friend.getString("latitude");
+            String lon = friend.getString("longitude");
+            String name = friend.getString("name");
+
+            //Float distanceFromMarker = distanceBetween((float)myNewLat,(float)myNewLon,(float)marker.getPosition().latitude, (float)marker.getPosition().longitude);
+
+            LatLng loc = new LatLng(Double.parseDouble(lat), Double.parseDouble(lon));
+            final MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(loc);
+            if(friend.getString("avatar").equals("default.jpg")){
+                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.def));
+            }
+            else
+                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bmp));
+            markerOptions.title(name);
+
+
+            runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         //stuff that updates ui
-
                         Marker marker = map.addMarker(markerOptions);
                         markerPlaceIdMap.put(marker,iterator);
+                        iterator++;
                     }
-                });
-            }
-            catch (JSONException e){
-                e.printStackTrace();
-            }
-
+            });
         }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+
     }
+
+
+
 
     public static float distanceBetween(float lat1, float lng1, float lat2, float lng2) {
         double earthRadius = 6371000; //meters
@@ -201,6 +275,13 @@ public class MyPlacesMapActivity extends AppCompatActivity implements OnMapReady
             DownloadManager.getInstance().getFriendsLocation(apiKey);
         }
         // map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 17.0f));
+
+        map.clear();
+        map.addCircle(new CircleOptions()
+                .center(currentLocation)
+                .radius(NOTIFY_DISTANCE)
+                .strokeWidth(0f)
+                .fillColor(0x550000FF));
 
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 17.0f));
     }
@@ -276,7 +357,37 @@ public class MyPlacesMapActivity extends AppCompatActivity implements OnMapReady
                 if(state == 1) {
                     try {
                         JSONArray friends = new JSONArray(s);
-                        addMyPlacesMarkers(friends);
+                        markerPlaceIdMap = new HashMap<Marker, Integer>((int)((double)friends.length()*1.2));
+                        for(int i = 0; i < friends.length(); i++)
+                        {
+                            final JSONObject friend = friends.getJSONObject(i);
+                            try {
+                                if(!friend.getString("avatar").equals("default.jpg")) {
+                                    URL url = new URL("zmurke.herokuapp.com/" + friend.getString("avatar"));
+                                    bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                                }
+                                else
+                                    bmp = null;
+                                addMarker(friend, bmp);
+                            } catch (Exception e){
+                                e.printStackTrace();
+                            }
+                            Thread thread = new Thread(new Runnable(){
+                                @Override
+                                public void run(){
+                                    URL url ;
+                                    try {
+                                        url = new URL("https://zmurke.herokuapp.com" + friend.getString("avatar"));
+                                        bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                                        addMarker(friend, Bitmap.createScaledBitmap(bmp, 80, 80, false));
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                            thread.start();
+                        }
+                        //addMyPlacesMarkers(friends);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -300,5 +411,15 @@ public class MyPlacesMapActivity extends AppCompatActivity implements OnMapReady
 
             }
         }
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
