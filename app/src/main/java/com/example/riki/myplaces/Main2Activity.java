@@ -17,9 +17,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-public class Main2Activity extends AppCompatActivity {
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class Main2Activity extends AppCompatActivity implements IThreadWakeUp {
 
     boolean clickEnabled;
+    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +33,7 @@ public class Main2Activity extends AppCompatActivity {
         final Bundle extras = intent.getExtras();
         final String apiKey = intent.getExtras().getString("api");
         clickEnabled = true;
+        DownloadManager.getInstance().setThreadWakeUp(this);
 
         if (getIntent().getBooleanExtra("EXIT", false)) {
 
@@ -72,8 +77,9 @@ public class Main2Activity extends AppCompatActivity {
 
             public void onClick(View v) {
                 v.startAnimation(animation);
-                Intent intent = new Intent(Main2Activity.this, MyPlacesMapActivity.class);
+                Intent intent = new Intent(Main2Activity.this, MapActivity.class);
                 intent.putExtra("api", apiKey);
+                intent.putExtra("safe_zone", user.safeZone);
                 startActivity(intent);
 
             }
@@ -84,8 +90,11 @@ public class Main2Activity extends AppCompatActivity {
 
             public void onClick(View v) {
                 v1.startAnimation(animation);
-                Intent intent = new Intent(Main2Activity.this, MainActivity.class);
-                startActivity(intent);
+                Intent map = new Intent(Main2Activity.this, MyPlacesMapActivity.class);
+                map.putExtra("state", MyPlacesMapActivity.SELECT_COORDINATES);
+                map.putExtra("api", apiKey);
+                map.putExtra("safe_zone", user.safeZone);
+                startActivityForResult(map,1);
 
 
             }
@@ -134,7 +143,8 @@ public class Main2Activity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        
+
+        DownloadManager.getInstance().getUser(apiKey);
     }
 
     @Override
@@ -143,6 +153,58 @@ public class Main2Activity extends AppCompatActivity {
             return true;
 
         return super.dispatchTouchEvent(event);
+    }
+
+    @Override
+    public void ResponseOk(String s) {
+        if(s.isEmpty())
+        {
+            //nije dobio podatke, treba uraditi nesto
+            //treba probati jos jednom da se pribave podaci, ako je doslo do greske, ponovo se poziva DownloadManager.getData
+            //ako nije ni tada, onda treba nekako obezbediti da ne pukne aplikacija
+            //ispisati poruku da je doslo do greske na serveru, to samo ako 2 puta ne dobijemo nista
+            //promenljiva koja to obezbedjuje
+        }
+        else
+        {
+            String html = "<!DOCTYPE html>";
+            if(s.toLowerCase().contains(html.toLowerCase()))
+            {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //stuff that updates ui
+                    }
+                });
+            }
+            else {
+                try{
+                    JSONObject data = new JSONObject(s);
+                    int currentLocation = data.getString("current_location") != null ? data.getInt("current_location") : 0;
+                    //String gm = data.getString("current_game");
+                    int currentGame = !data.getString("current_game").equals("null") ? data.getInt("current_game") : 0;
+                    int safeZone = !data.getString("safe_zone").equals("null") ? data.getInt("safe_zone") : 0;
+                    boolean inSafeZone = data.getInt("in_safe_zone") == 0 ? false : true;
+                    boolean hunter = data.getInt("hunter") == 0 ? false : true;
+                    int points = data.getInt("points");
+                    user = new User(
+                            data.getString("first_name"),
+                            data.getString("last_name"),
+                            data.getInt("id"),
+                            currentLocation,
+                            currentGame,
+                            safeZone,
+                            inSafeZone,
+                            hunter,
+                            points
+                    );
+
+                } catch (JSONException e){
+                    e.printStackTrace();
+                }
+
+            }
+        }
     }
 
 

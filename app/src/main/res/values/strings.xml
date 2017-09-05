@@ -56,6 +56,9 @@
 
     <string name="no_internet">No internet connection</string>
     <string name="registration_successful">Registration successful!</string>
+    <string name="safe_zone">Select your safe zone</string>
+    <string name="safe_zone_title">Safe Zone</string>
+    <string name="already_safe_zone">You already have a safe zone</string>
 
     <string name="time_name">Choose time limit</string>
 
@@ -66,6 +69,7 @@
         <item>20 minutes</item>
         <item>30 minutes</item>
     </string-array>
+    <string name="title_activity_map">MapActivity</string>
 
 
 </resources>

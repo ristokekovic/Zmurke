@@ -54,6 +54,29 @@ public class DownloadManager {
         t.start();
     }
 
+    public void getAnyUser(final String apiToken, final int id)
+    {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Request request = new Request.Builder()
+                            .url("https://zmurke.herokuapp.com/api/user/" + Integer.toString(id))
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
     public void register(final String name, final String email, final String password)
     {
         Thread t = new Thread(new Runnable() {
@@ -387,6 +410,58 @@ public class DownloadManager {
                 try {
                     Request request = new Request.Builder()
                             .url("https://zmurke.herokuapp.com/api/user/friends_location")
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+    public void createSafeZone(final String apiToken, final double latitude, final double longitude)
+    {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    RequestBody formBody = new FormBody.Builder()
+                            .add("latitude", String.valueOf(latitude))
+                            .add("longitude", String.valueOf(longitude))
+                            .build();
+                    Request request = new Request.Builder()
+                            .url("https://zmurke.herokuapp.com/api/safe_zone")
+                            .post(formBody)
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+    public void getSafeZone(final String apiToken)
+    {
+        final String url = "https://zmurke.herokuapp.com/api/safe_zone";
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Request request = new Request.Builder()
+                            .url(url)
                             .addHeader("api", apiToken)
                             .build();
 

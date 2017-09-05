@@ -17,6 +17,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.support.design.widget.BaseTransientBottomBar;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +29,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,11 +72,13 @@ public class MyPlacesMapActivity extends AppCompatActivity implements OnMapReady
 
 
     GoogleMap map;
+    Snackbar snackbar;
     LocationManager locationManager;
     int state = 0;
     int timer = 0;
     Bitmap bmp;
     public int iterator;
+    private FloatingActionButton selectSafeZone;
     private TextView countdown;
     private Intent backgroundService;
     private long miliseconds;
@@ -145,6 +152,32 @@ public class MyPlacesMapActivity extends AppCompatActivity implements OnMapReady
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+
+        final CoordinatorLayout coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
+
+        selectSafeZone = (FloatingActionButton) findViewById(R.id.selectSafeZone);
+        selectSafeZone.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                selCoorsEnabled = true;
+                selectSafeZone.setEnabled(false);
+                selectSafeZone.setVisibility(View.INVISIBLE);
+                snackbar = Snackbar.make(coordinatorLayout, getString(R.string.safe_zone), Snackbar.LENGTH_INDEFINITE);
+                snackbar.show();
+            }
+        });
+
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener(){
+            @Override
+            public void onMapClick(LatLng latLng){
+                if(selCoorsEnabled) {
+                    String lon = Double.toString(latLng.longitude);
+                    String lat = Double.toString(latLng.latitude);
+                    selCoorsEnabled = false;
+                    snackbar.dismiss();
+                    Log.d("Clicked", "Picked up");
+                }
+            }
+        });
 
         if(state == SHOW_MAP)
         {
