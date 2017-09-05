@@ -16,7 +16,12 @@
     <!-- Base application theme. -->
 
     <!-- Customize your theme here. -->
+<style name="AppTheme.CustomTheme">
+    <item name="android:windowIsTranslucent">true</item>
+    <item name="android:windowCloseOnTouchOutside">true</item>
 
+
+</style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

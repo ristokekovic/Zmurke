@@ -67,5 +67,7 @@
         <item>30 minutes</item>
     </string-array>
 
+    <string name="avatarString"> change picture </string>
+
 
 </resources>

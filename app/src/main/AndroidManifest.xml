@@ -83,11 +83,15 @@
         <activity
             android:name=".PasswordActivity"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
-        <activity android:name=".RankingActivity"
+        <activity
+            android:name=".RankingActivity"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
         <activity android:name=".FriendsActivity" />
-        <activity android:name=".PlayActivity"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"></activity>
+        <activity
+            android:name=".PlayActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+        <activity android:name=".FriendProfileActivity"
+            android:theme="@style/AppTheme.CustomTheme" ></activity>
     </application>
 
 </manifest>

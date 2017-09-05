@@ -26,12 +26,16 @@ public class FriendsActivity extends AppCompatActivity implements IThreadWakeUp 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
-
+        listItems.add("Kao prijatelji");
+        listItems.add("hehehe");
         ListView friends = (ListView) findViewById(R.id.listViewFriends);
         friends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int position,
                                     long id) {
+
+             //   Intent intent = new Intent(FriendsActivity.this,FriendProfileActivity.class);
+             //   startActivity(intent);
 
                 //TODO: Create a new profile activity that is non-editable, for opening profiles of user's friends
                 //Or better yet, make a pop-up window with this information
