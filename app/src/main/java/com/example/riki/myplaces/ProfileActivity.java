@@ -1,16 +1,22 @@
 package com.example.riki.myplaces;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -21,7 +27,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,6 +38,9 @@ import java.io.InputStream;
 
 
 import android.content.SharedPreferences;
+
+import static java.lang.Thread.sleep;
+
 public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp{
 
     boolean updated = false;
@@ -39,7 +51,8 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
     String encodedImage;
     ImageView buttonphoto;
     String userMail;
-    File fajl, filee;
+    File fajl, filee, appDir;
+    ProgressDialog progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +63,8 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
         Bundle extras = intent.getExtras();
         encodedImage = "";
         DownloadManager.getInstance().setThreadWakeUp(this);
+
+
 
         firstname = (EditText) findViewById(R.id.firstnameT);
         lastname = (EditText) findViewById(R.id.lastnameT);
@@ -64,7 +79,7 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
        // final ImageView button = (ImageView) findViewById(R.id.slika);
         final TextView tx = (TextView) findViewById(R.id.textView4);
       // tx.setVisibility(View.INVISIBLE);
-
+        tx.setPaintFlags(tx.getPaintFlags() |Paint.UNDERLINE_TEXT_FLAG);
         tx.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
@@ -85,9 +100,13 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
 
             public void onClick(View v) {
         button1.startAnimation(animation);
-                Intent intent = new Intent(ProfileActivity.this,PasswordActivity.class);
+             /*   Intent intent = new Intent(ProfileActivity.this,PasswordActivity.class);
                 intent.putExtra("api", apiKey);
                 intent.putExtra("email",userMail);
+                startActivity(intent);*/
+
+                Intent intent = new Intent(ProfileActivity.this,FriendProfileActivity.class);
+                intent.putExtra("api", apiKey);
                 startActivity(intent);
 
             }
@@ -130,17 +149,48 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
             public void onClick(View v) {
         iw2.startAnimation(animation);
                 if (apiKey != null) {
-
+                    getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     updated = true;
                     firstn = firstname.getText().toString();
                     lastn = lastname.getText().toString();
                     phonen = phone.getText().toString();
 
-                    if(filee != null)
-                        DownloadManager.getInstance().newUpdate(firstn,lastn,phonen,filee,apiKey);
+                    progress = new ProgressDialog(ProfileActivity.this);
+                    progress.setMessage("Updating your profile:" );
+                    progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                    progress.setIndeterminate(true);
+                    progress.setProgress(0);
+                    progress.show();
+                    final int totalProgressTime = 100;
+                    int jumpTime = 5;
+
+                    if(appDir != null)
+                        DownloadManager.getInstance().newUpdate(firstn,lastn,phonen,appDir,apiKey);
                     else
                         DownloadManager.getInstance().update(firstn,lastn,phonen,apiKey);
 
+
+                    final Thread t = new Thread() {
+                        @Override
+                        public void run() {
+                            int jumpTime = 0;
+
+                            while(jumpTime < totalProgressTime) {
+                                try {
+                                    sleep(200);
+                                    jumpTime += 5;
+                                    progress.setProgress(jumpTime);
+                                } catch (InterruptedException e) {
+                                    // TODO Auto-generated catch block
+                                    e.printStackTrace();
+                                }
+                            }
+
+                        }
+
+                    };
+                    t.start();
                 }
 
             }
@@ -214,6 +264,26 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
 
                 final Uri imageUri = data.getData();
                 filee = new File(getPath(imageUri));
+                Bitmap proba = decodeFile(filee);
+
+                String filePath = Environment.getExternalStorageDirectory().toString();
+                String fileName = "someFileName.jpg";
+                String path = Environment.getExternalStorageDirectory().toString();
+                appDir = new File(filePath,fileName);
+                appDir.createNewFile();
+
+//Convert bitmap to byte array
+
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                proba.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+                byte[] bitmapdata = bos.toByteArray();
+
+//write the bytes in file
+                FileOutputStream fos = new FileOutputStream(appDir);
+                fos.write(bitmapdata);
+                fos.flush();
+                fos.close();
+
 
                 final InputStream imageStream = getContentResolver().openInputStream(imageUri);
                 final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
@@ -221,9 +291,9 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
 
                 fajl = saveBitmap(selectedImage1,imageUri.getPath());
                 buttonphoto = (ImageView) findViewById(R.id.slika);
-                buttonphoto.setImageBitmap(selectedImage);
+                buttonphoto.setImageBitmap(proba);
 
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 Toast.makeText(ProfileActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
             }
@@ -231,6 +301,66 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
         }else {
             Toast.makeText(ProfileActivity.this, "You haven't picked Image",Toast.LENGTH_LONG).show();
         }
+    }
+
+    private Bitmap decodeFile(File f) throws IOException {
+
+
+
+        Bitmap b = null;
+
+        //Decode image size
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inJustDecodeBounds = true;
+
+        FileInputStream fis = new FileInputStream(f);
+        BitmapFactory.decodeStream(fis, null, o);
+        fis.close();
+
+        int scale = 1;
+        if (o.outWidth > 650 || o.outHeight > 650 ) {
+            scale = (int)Math.pow(2, (int) Math.ceil(Math.log( o.outHeight/2 /
+                    (double) Math.max(o.outHeight, o.outWidth)) / Math.log(0.5)));
+        }
+
+        //Decode with inSampleSize
+        BitmapFactory.Options o2 = new BitmapFactory.Options();
+        o2.inSampleSize = scale;
+        fis = new FileInputStream(f);
+        b = BitmapFactory.decodeStream(fis, null, o2);
+        fis.close();
+
+
+        ExifInterface exif = null;
+        try {
+            exif = new ExifInterface(f.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        int orientation = ExifInterface.ORIENTATION_NORMAL;
+        if (exif != null)
+            orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                b = rotateBitmap(b, 90);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                b = rotateBitmap(b, 180);
+                break;
+
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                b = rotateBitmap(b, 270);
+                break;
+        }
+
+
+        return b;
+    }
+    public static Bitmap rotateBitmap(Bitmap bitmap, int degrees) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degrees);
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
     private File saveBitmap(final Bitmap bitmap, final String path) {
@@ -331,7 +461,7 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
                         //stuff that updates ui
 
                         if(updated){
-
+                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                             Toast.makeText(ProfileActivity.this, "Profile succesfully updated.", Toast.LENGTH_SHORT).show();
                             updated = false;
                             finish();

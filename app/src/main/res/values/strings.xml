@@ -71,5 +71,7 @@
     </string-array>
     <string name="title_activity_map">MapActivity</string>
 
+    <string name="avatarString"> change picture </string>
+
 
 </resources>
