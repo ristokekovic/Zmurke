@@ -54,14 +54,14 @@ public class DownloadManager {
         t.start();
     }
 
-    public void getAnyUser(final String apiToken, final int id)
+    public void getAnyUser(final String apiToken, final String id)
     {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     Request request = new Request.Builder()
-                            .url("https://zmurke.herokuapp.com/api/user/" + Integer.toString(id))
+                            .url("https://zmurke.herokuapp.com/api/user/" + id)
                             .addHeader("api", apiToken)
                             .build();
 

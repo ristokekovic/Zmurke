@@ -10,7 +10,7 @@
 
     <EditText
         android:id="@+id/editText"
-        android:textColor="@color/dot_dark_screen2"
+        android:textColor="@color/dot_dark_screen1"
         android:textColorHint="@color/red"
         app:backgroundTint="@color/red"
         android:layout_width="267dp"
@@ -29,7 +29,7 @@
         android:layout_width="267dp"
         android:layout_height="39dp"
         android:ems="10"
-        android:textColor="@color/dot_dark_screen2"
+        android:textColor="@color/dot_dark_screen1"
         android:textColorHint="@color/red"
         app:backgroundTint="@color/red"
         android:hint= "password"
@@ -57,7 +57,7 @@
 
     <Button
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:textColor="@color/dot_dark_screen2"
+        android:textColor="@color/dot_dark_screen1"
         android:color="#66FF0000"
         android:alpha="0.8"
         android:id="@+id/button3"
