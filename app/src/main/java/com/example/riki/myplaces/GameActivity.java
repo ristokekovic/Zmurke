@@ -9,18 +9,13 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -37,34 +32,26 @@ import org.json.JSONObject;
 import java.net.URL;
 import java.util.HashMap;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener, IThreadWakeUp {
+public class GameActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener, IThreadWakeUp {
 
     GoogleMap map;
     Snackbar snackbar;
     LocationManager locationManager;
-
-    private boolean selCoorsEnabled = false;
-    private FloatingActionButton selectSafeZone;
-    private int state = 0;
-    private int timer = 0;
-    private HashMap<Marker, Integer> markerPlaceIdMap;
     private String apiKey;
-    private int safeZone;
-    private int iterator;
-    private Bitmap bmp;
+    private int state;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map);
+        setContentView(R.layout.activity_game);
         DownloadManager.getInstance().setThreadWakeUp(this);
+
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         apiKey = intent.getExtras().getString("api");
-        safeZone = intent.getExtras().getInt("safe_zone");
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -79,15 +66,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             return;
         }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
-
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        timer++;
-        LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 17.0f));
     }
 
     @Override
@@ -106,7 +89,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void ResponseOk(String s) {
+    public void ResponseOk(String s)
+    {
         if(s.isEmpty())
         {
             //nije dobio podatke, treba uraditi nesto
@@ -129,7 +113,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
             else {
                 if(state == 1) {
-                    try {
+                    /*try {
                         JSONArray friends = new JSONArray(s);
                         markerPlaceIdMap = new HashMap<Marker, Integer>((int)((double)friends.length()*1.2));
                         for(int i = 0; i < friends.length(); i++)
@@ -176,32 +160,38 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         });
                     } catch (JSONException e) {
                         e.printStackTrace();
-                    }
+                    }*/
                 }
 
                 if(state == 2 || state == 3){
                     try{
-                        JSONObject safeZone = new JSONObject(s);
-                        final LatLng position = new LatLng(safeZone.getDouble("latitude"), safeZone.getDouble("longitude"));
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                map.clear();
-                                map.addCircle(new CircleOptions()
-                                        .center(position)
-                                        .radius(50)
-                                        .strokeWidth(0f)
-                                        .fillColor(Color.GREEN));
-                                final MarkerOptions markerOptions = new MarkerOptions();
-                                markerOptions.position(position);
-                                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.safehouse));
-                                markerOptions.title(getString(R.string.safe_zone_title));
-                                Marker marker = map.addMarker(markerOptions);
-                            }
-                        });
+                        JSONArray safeZones = new JSONArray(s);
+                        for(int i = 0; i < safeZones.length(); i++){
+                            final JSONObject safeZone = safeZones.getJSONObject(i);
+                            final LatLng position = new LatLng(safeZone.getDouble("latitude"), safeZone.getDouble("longitude"));
+                            Log.d("Color", String.valueOf(Color.parseColor(safeZone.getString("color"))));
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try{
+                                        map.addCircle(new CircleOptions()
+                                                .center(position)
+                                                .radius(50)
+                                                .strokeWidth(0f)
+                                                .fillColor(Color.parseColor(safeZone.getString("color"))));
+                                        final MarkerOptions markerOptions = new MarkerOptions();
+                                        markerOptions.position(position);
+                                        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.safehouse));
+                                        markerOptions.title(getString(R.string.safe_zone_title));
+                                        Marker marker = map.addMarker(markerOptions);
+                                    } catch (JSONException e){
+                                        e.printStackTrace();
+                                    }
 
-                        state = 1;
-                        DownloadManager.getInstance().getFriendsLocation(apiKey);
+                                }
+                            });
+                        }
+
                     } catch (JSONException e){
                         e.printStackTrace();
                     }
@@ -212,42 +202,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(GoogleMap googleMap)
+    {
         map = googleMap;
-
-        final CoordinatorLayout coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
-
-        selectSafeZone = (FloatingActionButton) findViewById(R.id.selectSafeZone);
-        if(safeZone != 0){
-            selectSafeZone.setVisibility(View.INVISIBLE);
-            state = 3;
-            DownloadManager.getInstance().getSafeZone(apiKey);
-        } else {
-            selectSafeZone.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    selCoorsEnabled = true;
-                    selectSafeZone.setEnabled(false);
-                    selectSafeZone.setVisibility(View.INVISIBLE);
-                    snackbar = Snackbar.make(coordinatorLayout, getString(R.string.safe_zone), Snackbar.LENGTH_INDEFINITE);
-                    snackbar.show();
-                }
-            });
-        }
-
-
-        map.setOnMapClickListener(new GoogleMap.OnMapClickListener(){
-            @Override
-            public void onMapClick(LatLng latLng){
-                if(selCoorsEnabled) {
-                    double lon = latLng.longitude;
-                    double lat = latLng.latitude;
-                    selCoorsEnabled = false;
-                    snackbar.dismiss();
-                    state = 3;
-                    DownloadManager.getInstance().createSafeZone(apiKey, lat, lon);
-                }
-            }
-        });
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED &&
@@ -264,44 +221,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             map.setMyLocationEnabled(true);
             map.getUiSettings().setMyLocationButtonEnabled(true);
         }
+
+        state = 2;
+        DownloadManager.getInstance().getFriendsSafeZones(apiKey);
     }
-
-    private void addMarker(JSONObject friend, Bitmap bmp){
-
-        try{
-            String lat = friend.getString("latitude");
-            String lon = friend.getString("longitude");
-            String name = friend.getString("name");
-
-            //Float distanceFromMarker = distanceBetween((float)myNewLat,(float)myNewLon,(float)marker.getPosition().latitude, (float)marker.getPosition().longitude);
-
-            LatLng loc = new LatLng(Double.parseDouble(lat), Double.parseDouble(lon));
-            final MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(loc);
-            if(friend.getString("avatar").equals("default.jpg")){
-                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.def));
-            }
-            else
-                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bmp));
-            markerOptions.title(name);
-
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    //stuff that updates ui
-                    Marker marker = map.addMarker(markerOptions);
-                    markerPlaceIdMap.put(marker,iterator);
-                    iterator++;
-                }
-            });
-        }
-        catch (JSONException e){
-            e.printStackTrace();
-        }
-
-    }
-
-
-
 }

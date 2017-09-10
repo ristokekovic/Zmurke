@@ -116,7 +116,8 @@ public class Main2Activity extends AppCompatActivity implements IThreadWakeUp {
 
             public void onClick(View v) {
                 v3.startAnimation(animation);
-                Intent intent = new Intent(Main2Activity.this,PlayActivity.class);
+                Intent intent = new Intent(Main2Activity.this,GameActivity.class);
+                intent.putExtra("api", apiKey);
                 startActivity(intent);
             }
         });
