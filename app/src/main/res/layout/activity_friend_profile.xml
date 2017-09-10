@@ -16,6 +16,7 @@
         android:layout_height="36dp"
         android:text="TextView"
         android:layout_marginRight="8dp"
+        android:textColor="@color/colorBlack"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="@+id/guideline6"
@@ -31,6 +32,7 @@
         android:layout_height="36dp"
         android:text="TextView"
         android:gravity="center"
+        android:textColor="@color/colorBlack"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="8dp"
@@ -45,7 +47,7 @@
         android:layout_width="132dp"
         android:layout_height="36dp"
         android:text="TextView"
-
+        android:textColor="@color/colorBlack"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/guideline6"
@@ -67,23 +69,26 @@
 
     <ImageView
         android:id="@+id/imageViewSlika"
-        android:layout_width="269dp"
-        android:layout_height="58dp"
+        android:layout_width="199dp"
+        android:layout_height="52dp"
         app:srcCompat="@drawable/crne"
-        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteY="6dp"
         app:layout_constraintRight_toLeftOf="@+id/toolbarProfile"
         app:layout_constraintLeft_toRightOf="@+id/toolbarProfile"
-        app:layout_constraintHorizontal_bias="0.524" />
+        app:layout_constraintHorizontal_bias="0.523"
+        tools:layout_editor_absoluteX="95dp" />
 
 
     <ImageView
         android:id="@+id/cancelButton"
-        android:layout_width="34dp"
-        android:layout_height="38dp"
+        android:layout_width="25dp"
+        android:layout_height="34dp"
         android:clickable="true"
         app:srcCompat="@drawable/unchecked"
-        tools:layout_editor_absoluteY="16dp"
-        tools:layout_editor_absoluteX="16dp" />
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="6dp" />
 
     <ImageView
         android:id="@+id/friendPhoto"
@@ -100,6 +105,7 @@
         android:layout_width="132dp"
         android:layout_height="36dp"
         android:text="TextView"
+        android:textColor="@color/colorBlack"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"
@@ -119,6 +125,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/guideline6"
         android:layout_marginRight="8dp"
+        android:textColor="@color/colorBlack"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="253dp"
         app:layout_constraintHorizontal_bias="0.772"

@@ -100,14 +100,12 @@ public class ProfileActivity extends AppCompatActivity implements  IThreadWakeUp
 
             public void onClick(View v) {
         button1.startAnimation(animation);
-             /*   Intent intent = new Intent(ProfileActivity.this,PasswordActivity.class);
+                Intent intent = new Intent(ProfileActivity.this,PasswordActivity.class);
                 intent.putExtra("api", apiKey);
                 intent.putExtra("email",userMail);
-                startActivity(intent);*/
-
-                Intent intent = new Intent(ProfileActivity.this,FriendProfileActivity.class);
-                intent.putExtra("api", apiKey);
                 startActivity(intent);
+
+
 
             }
         });

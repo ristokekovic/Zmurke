@@ -23,9 +23,9 @@ import org.json.JSONObject;
 
 import java.io.InputStream;
 
-public class FriendProfileActivity extends AppCompatActivity implements  IThreadWakeUp {
+public class FriendProfileActivity extends AppCompatActivity {
     String apiKey;
-    String namef, pnumber,emailf, pointsf;
+    String frname, frlastn, fremail, frphone,frurl,frpoints;
     TextView name1,lastname1,phone1,email1,points1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +40,13 @@ public class FriendProfileActivity extends AppCompatActivity implements  IThread
 
         final Intent intent = getIntent();
         apiKey = intent.getExtras().getString("api");
-        DownloadManager.getInstance().setThreadWakeUp(this);
+        frname = intent.getExtras().getString("fname");
+        frlastn = intent.getExtras().getString("lname");
+        fremail = intent.getExtras().getString("email");
+        frphone = intent.getExtras().getString("phone");
+        frurl = intent.getExtras().getString("url");
+        frpoints = intent.getExtras().getString("points");
+        //DownloadManager.getInstance().setThreadWakeUp(this);
 
         name1 = (TextView) findViewById(R.id.nameFriend);
         lastname1 = (TextView) findViewById(R.id.lastNameFriend);
@@ -48,11 +54,20 @@ public class FriendProfileActivity extends AppCompatActivity implements  IThread
         phone1 = (TextView) findViewById(R.id.phoneFriend);
         points1 = (TextView) findViewById(R.id.pointsFriend);
 
-        if (apiKey != null) {
+        name1.setText(frname);
+        lastname1.setText(frlastn);
+        email1.setText(fremail);
+        phone1.setText(frphone);
+        points1.setText(frpoints);
+        if (frurl != "null") {
+            new FriendProfileActivity.DownloadImageTask((ImageView) findViewById(R.id.friendPhoto))
+                    .execute("https://zmurke.herokuapp.com" + frurl);
+        }
+       /* if (apiKey != null) {
 
             DownloadManager.getInstance().getUser(apiKey);
 
-        }
+        }*/
 
 
         final Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.alpha);
@@ -67,103 +82,7 @@ public class FriendProfileActivity extends AppCompatActivity implements  IThread
         });
     }
 
-    @Override
-    public void ResponseOk(final String s) {
 
-
-        if(s.isEmpty())
-        {
-            //nije dobio podatke, treba uraditi nesto
-            //treba probati jos jednom da se pribave podaci, ako je doslo do greske, ponovo se poziva DownloadManager.getData
-            //ako nije ni tada, onda treba nekako obezbediti da ne pukne aplikacija
-            //ispisati poruku da je doslo do greske na serveru, to samo ako 2 puta ne dobijemo nista
-            //promenljiva koja to obezbedjuje
-            Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show();
-        }
-        else
-        {
-            String html = "<!DOCTYPE html>";
-            if(s.toLowerCase().contains(html.toLowerCase()))
-            {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //stuff that updates ui
-                        //  setErrorMessage();
-                    }
-                });
-            }
-            else {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //stuff that updates ui
-
-
-                            try {
-
-
-                                JSONObject reader = new JSONObject(s);
-                                String email = reader.getString("email");
-                                //userMail = email;
-
-                                String username = reader.getString("name");
-                                String firstName = reader.getString("first_name");
-                                String lastName = reader.getString("last_name");
-                                String phoneNumber = reader.getString("phone_number");
-                                String urlImage = reader.getString("avatar");
-                                String pointsNumber = reader.getString("points");
-
-                                if (firstName != "null")
-                                    name1.setText(firstName);
-                                else
-                                    name1.setText("");
-
-                                if (lastName != "null")
-                                    lastname1.setText(lastName);
-                                else
-                                    lastname1.setText("");
-
-                                if (phoneNumber != "null")
-                                    phone1.setText(phoneNumber);
-                                else
-                                    phone1.setText("");
-
-                                if (urlImage != "null")
-                                {
-                                    new FriendProfileActivity.DownloadImageTask((ImageView) findViewById(R.id.friendPhoto))
-                                            .execute("https://zmurke.herokuapp.com" + urlImage);
-
-                                   /* b = Base64.decode(imgBase64, Base64.DEFAULT);
-                                    Bitmap decodedImage = BitmapFactory.decodeByteArray(b, 0, b.length);
-                                    buttonphoto.setImageBitmap(decodedImage);*/
-
-                                }
-
-                                if(pointsNumber!=null)
-                                    points1.setText(pointsNumber);
-
-                                if (email != null)
-                                email1.setText(email);
-
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-
-
-                    }
-                });
-
-
-
-
-            }
-        }
-
-
-    }
 
 
 

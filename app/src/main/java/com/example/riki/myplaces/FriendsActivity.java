@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,30 +22,39 @@ public class FriendsActivity extends AppCompatActivity implements IThreadWakeUp 
 
     ArrayList<String> listItems=new ArrayList<String>();
     ArrayAdapter<String> adapter;
-
+    String apiKey;
+    boolean ok = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
-        listItems.add("Kao prijatelji");
-        listItems.add("hehehe");
+        final Intent intent = getIntent();
+        apiKey = intent.getExtras().getString("api");
+        DownloadManager.getInstance().setThreadWakeUp(this);
+
+        //listItems.add("Kao prijatelji");
+        //listItems.add("hehehe");
         ListView friends = (ListView) findViewById(R.id.listViewFriends);
         friends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int position,
                                     long id) {
 
-             //   Intent intent = new Intent(FriendsActivity.this,FriendProfileActivity.class);
-             //   startActivity(intent);
+
+                String val =(String) listItems.get(position);
+                val.substring(0,val.indexOf(' ')); // "72"
+                val = val.replaceAll("\\D+","");
+              //  Toast.makeText(FriendsActivity.this, "RAAADI" , Toast.LENGTH_LONG).show();
+               // int idf = Integer.parseInt(val);
+                ok=true;
+
+                DownloadManager.getInstance().getAnyUser(apiKey,val);
+
 
                 //TODO: Create a new profile activity that is non-editable, for opening profiles of user's friends
                 //Or better yet, make a pop-up window with this information
             }
         });
-        DownloadManager.getInstance().setThreadWakeUp(this);
-
-        Intent intent = getIntent();
-        final String apiKey = intent.getExtras().getString("api");
 
         adapter=new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1,
@@ -55,7 +65,7 @@ public class FriendsActivity extends AppCompatActivity implements IThreadWakeUp 
     }
 
     @Override
-    public void ResponseOk(String s) //on ceka da se thread zavrsi odnosno da dobije podatke sa servera
+    public void ResponseOk(final String s) //on ceka da se thread zavrsi odnosno da dobije podatke sa servera
     {
 
         if(s.isEmpty())
@@ -81,24 +91,73 @@ public class FriendsActivity extends AppCompatActivity implements IThreadWakeUp 
             }
             else {*/
                 try {
-                    JSONArray friends = new JSONArray(s);
-                    JSONObject[] elements = new JSONObject[friends.length()];
-                    final String[] names = new String[friends.length()];
-                    for(int i = 0; i < friends.length(); i++)
-                    {
-                        elements[i] = friends.getJSONObject(i);
-                        names[i] = elements[i].getString("name");
-                        final int iterator = i;
+
+                    if(ok){
+
+
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                //stuff that updates ui
-                                listItems.add(names[iterator]);
-                                adapter.notifyDataSetChanged();
+
+
+
+                                String firstName = null;
+                                try {
+
+                                    JSONObject reader = new JSONObject(s);
+                                    firstName = reader.getString("first_name");
+                                    String lastName = reader.getString("last_name");
+                                    String email = reader.getString("email");
+                                    String points = reader.getString("points");
+                                    String phoneNumber = reader.getString("phone_number");
+                                    String urlImage = reader.getString("avatar");
+
+                                    Intent intent = new Intent(FriendsActivity.this,FriendProfileActivity.class);
+                                    intent.putExtra("api", apiKey);
+                                    intent.putExtra("fname", firstName);
+                                    intent.putExtra("lname", lastName);
+                                    intent.putExtra("email", email);
+                                    intent.putExtra("phone", phoneNumber);
+                                    intent.putExtra("url", urlImage);
+                                    intent.putExtra("points",points);
+                                    startActivity(intent);
+                                   // Toast.makeText(FriendsActivity.this, "RAAADI" , Toast.LENGTH_LONG).show();
+
+                                    ok =false;
+
+
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+
                             }
                         });
-                    }
 
+
+
+                    }
+                    else {
+                        JSONArray friends = new JSONArray(s);
+                        JSONObject[] elements = new JSONObject[friends.length()];
+                        final String[] names = new String[friends.length()];
+                        final String[] id = new String[friends.length()];
+                        for (int i = 0; i < friends.length(); i++) {
+                            elements[i] = friends.getJSONObject(i);
+                            names[i] = elements[i].getString("name");
+                            id[i] = elements[i].getString("id");
+                            final int iterator = i;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //stuff that updates ui
+                                    listItems.add("#" + id[iterator] + " " + names[iterator] );
+                                    adapter.notifyDataSetChanged();
+                                }
+                            });
+                        }
+                    }
 
                 } catch (JSONException e){
                     e.printStackTrace();
