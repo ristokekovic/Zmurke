@@ -12,10 +12,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-/**
- * Created by Riki on 7/28/2017.
- */
-
 public class DownloadManager {
     private static DownloadManager instance = new DownloadManager();
     private OkHttpClient client = new OkHttpClient();
@@ -456,6 +452,30 @@ public class DownloadManager {
     public void getSafeZone(final String apiToken)
     {
         final String url = "https://zmurke.herokuapp.com/api/safe_zone";
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Request request = new Request.Builder()
+                            .url(url)
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+
+    public void getFriendsSafeZones(final String apiToken)
+    {
+        final String url = "https://zmurke.herokuapp.com/api/user/friends_safe_zones";
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {

@@ -191,7 +191,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                         .center(position)
                                         .radius(50)
                                         .strokeWidth(0f)
-                                        .fillColor(Color.GREEN));
+                                        .fillColor(Color.argb(50, 0, 200, 0)));
                                 final MarkerOptions markerOptions = new MarkerOptions();
                                 markerOptions.position(position);
                                 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.safehouse));

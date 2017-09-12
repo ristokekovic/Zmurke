@@ -60,6 +60,8 @@
     <string name="safe_zone_title">Safe Zone</string>
     <string name="already_safe_zone">You already have a safe zone</string>
 
+    <string name="turn_on_location">Please turn on your location</string>
+
     <string name="time_name">Choose time limit</string>
 
     <string-array name="time_limit">
