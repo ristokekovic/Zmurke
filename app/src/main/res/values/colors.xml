@@ -23,6 +23,7 @@
     <color name= "pozadina">#F4511E</color>
     <color name="background_holo_light">#fffafafa</color>
     <color name="red">#F14F5F</color>
+    <color name="yellow">#FFD700</color>
     <!-- dots active colors -->
     <color name="dot_light_screen1">#8cf9eb</color>
     <color name="dot_light_screen2">#FFEB3B</color>

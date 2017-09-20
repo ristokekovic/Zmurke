@@ -1,5 +1,6 @@
 package com.example.riki.myplaces;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,6 +10,8 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.Image;
+import android.os.CountDownTimer;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -16,6 +19,10 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -39,12 +46,15 @@ import java.util.Random;
 public class GameActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener, IThreadWakeUp {
 
     private static final int NOTIFY_DISTANCE = 5000;
+    private static final int CATCH_DISTANCE = 10;
+    private static final int SAFE_ZONE_DISTANCE = 5000;
     private static int EARTH_RADIUS = 6371000;
 
     GoogleMap map;
     Snackbar snackbar;
     LocationManager locationManager;
     private String apiKey;
+    private User user;
     private int state;
     private ArrayList<SafeZone> zones;
     private HashMap<Marker, Integer> markerPlaceIdMap;
@@ -53,6 +63,20 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double currentLat;
     private double currentLon;
     private boolean enabled = false;
+    private boolean countdownStarted = false;
+    private boolean loadedSafeZones = false;
+    private boolean snackbarShown = false;
+    private CountDownTimer countDownTimer;
+    private CountDownTimer survivalTimer;
+    private CountDownTimer inactiveTimer;
+    private ConstraintLayout constraintLayout;
+    private TextView countdown;
+    private TextView points;
+    private ImageView hunterIcon;
+    private long miliseconds;
+    private long survivedMiliseconds;
+    private long inactiveMiliseconds;
+    private Intent backgroundService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,12 +84,20 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_game);
         DownloadManager.getInstance().setThreadWakeUp(this);
 
+        constraintLayout = (ConstraintLayout) findViewById(R.id.constraint_layout);
+
+        countdown = (TextView) findViewById(R.id.timer);
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         apiKey = intent.getExtras().getString("api");
+        user = (User) intent.getSerializableExtra("user");
+
+        if(!user.hunter){
+            survivalCountdown();
+        }
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -84,27 +116,144 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onLocationChanged(Location location) {
-        enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if (enabled) {
-            snackbar.dismiss();
-        }
+        if(loadedSafeZones){
+            enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            if (enabled) {
+                if(snackbarShown){
+                    snackbar.dismiss();
+                }
+            }
 
-        currentLat = location.getLatitude();
-        currentLon = location.getLongitude();
+            currentLat = location.getLatitude();
+            currentLon = location.getLongitude();
 
-        LatLng position = new LatLng(currentLat, currentLon);
+            LatLng position = new LatLng(currentLat, currentLon);
 
-        map.addCircle(new CircleOptions()
+        /*map.addCircle(new CircleOptions()
                 .center(position)
                 .radius(50)
                 .strokeWidth(5f)
-                .strokeColor(Color.BLUE));
+                .strokeColor(Color.BLUE));*/
 
-        state = 1;
+            state = 1;
 
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 17.0f));
-        DownloadManager.getInstance().getFriendsLocation(apiKey);
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 17.0f));
+            SafeZone sz = zones.get(0);
+            if (distanceBetween((float) currentLat, (float) currentLon, (float) sz.latitude, (float) sz.longitude) < SAFE_ZONE_DISTANCE) {
+                if(!user.hunter){
+                    if(!countdownStarted)
+                        Toast.makeText(GameActivity.this, "You have entered your safe zone!", Toast.LENGTH_SHORT).show();
+                    countdown();
+                    state = 4;
+                    DownloadManager.getInstance().addLocation((float) currentLat, (float) currentLon, true, apiKey);
+                } else {
+                    state = 4;
+                    DownloadManager.getInstance().addLocation((float) currentLat, (float) currentLon, false, apiKey);
+                }
+            } else {
+                if(!user.hunter)
+                    stopCountdown();
 
+                state = 4;
+                DownloadManager.getInstance().addLocation((float) currentLat, (float) currentLon, false, apiKey);
+            }
+        }
+    }
+
+    public void countdown() {
+        if (!countdownStarted) {
+            countdownStarted = true;
+            stopSurvivalCountdown();
+            countdown.setVisibility(View.VISIBLE);
+
+            countDownTimer = null;
+            countDownTimer = new CountDownTimer(30000, 1000) {
+
+                public void onTick(long millisUntilFinished) {
+                    miliseconds = millisUntilFinished;
+                    if (millisUntilFinished / 1000 > 10)
+                        countdown.setTextColor(Color.GREEN);
+                    else
+                        countdown.setTextColor(Color.RED);
+                    if((millisUntilFinished % 60000) / 1000 == 10)
+                        Toast.makeText(GameActivity.this, "Get out of your safe zone!", Toast.LENGTH_SHORT).show();
+                    if ((millisUntilFinished % 60000) / 1000 < 10){
+                        countdown.setText(millisUntilFinished / 60000 + " : 0" + (millisUntilFinished % 60000) / 1000);
+                    }
+                    else{
+                        countdown.setText(millisUntilFinished / 60000 + " : " + (millisUntilFinished % 60000) / 1000);
+                    }
+
+                }
+
+                public void onFinish() {
+                    countdown.setText("0 : 00");
+                    Toast.makeText(GameActivity.this, "You lost 10 points", Toast.LENGTH_SHORT).show();
+                    user.points -= 10;
+                    points.setText("Points: " + user.points);
+                    state = 5;
+                    DownloadManager.getInstance().subtractPoints(apiKey, 10);
+                }
+            }.start();
+        }
+    }
+
+    public void stopCountdown()
+    {
+        countDownTimer.cancel();
+        countdown.setVisibility(View.GONE);
+        countdownStarted = false;
+    }
+
+    public void survivalCountdown()
+    {
+        if(!user.hunter){
+
+            survivalTimer = new CountDownTimer(600000, 1000) {
+
+                long milisecondsPassed = 0;
+
+                public void onTick(long millisUntilFinished) {
+                    survivedMiliseconds = millisUntilFinished;
+                    milisecondsPassed += 1000;
+                    if (milisecondsPassed % 60000 == 0){
+                        Toast.makeText(GameActivity.this, "You survived for one minute and gained 20 points", Toast.LENGTH_SHORT).show();
+                        user.points += 20;
+                        points.setText("Points: " + user.points);
+                        state = 4;
+                        DownloadManager.getInstance().subtractPoints(apiKey, 10);
+                    }
+                }
+
+                public void onFinish() {
+                }
+            }.start();
+        }
+    }
+
+    public void stopSurvivalCountdown()
+    {
+        survivalTimer.cancel();
+        survivalCountdown();
+    }
+
+    public void inactiveCountdown()
+    {
+        Toast.makeText(GameActivity.this, "You have one minute to hide again", Toast.LENGTH_SHORT).show();
+        inactiveTimer = new CountDownTimer(60000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                inactiveMiliseconds = millisUntilFinished;
+                if(millisUntilFinished == 30000){
+                    Toast.makeText(GameActivity.this, "You have 30 more seconds of invisibility", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            public void onFinish() {
+                state = 10;
+                DownloadManager.getInstance().setActive(apiKey);
+            }
+        }.start();
     }
 
     @Override
@@ -152,7 +301,9 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     (float) currentLon,
                                     Float.valueOf(lat),
                                     Float.valueOf(lon));
-                            if (distance < NOTIFY_DISTANCE) {
+                            boolean inSafeZone = friend.getInt("in_safe_zone") == 1;
+                            boolean active = friend.getInt("active") == 1;
+                            if (distance < NOTIFY_DISTANCE && !inSafeZone && active) {
                                 try {
                                     if (!friend.getString("avatar").equals("default.jpg")) {
                                         URL url = new URL("zmurke.herokuapp.com/" + friend.getString("avatar"));
@@ -177,6 +328,27 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     }
                                 });
                                 thread.start();
+
+                                if(distance < CATCH_DISTANCE && user.hunter && !friend.getBoolean("hunter")){
+                                    Toast.makeText(GameActivity.this, "You caught " + friend.getString("name"), Toast.LENGTH_SHORT).show();
+                                    user.points += 50;
+                                    points.setText("Points: " + user.points);
+                                    state = 6;
+                                    DownloadManager.getInstance().addPoints(apiKey, 50);
+                                }
+
+                                if(distance < CATCH_DISTANCE && !user.hunter && friend.getBoolean("hunter")){
+                                    Toast.makeText(GameActivity.this, "You have been caught by " + friend.getString("name"), Toast.LENGTH_SHORT).show();
+                                    user.points -= 100;
+                                    points.setText("Points: " + user.points);
+                                    stopSurvivalCountdown();
+                                    state = 7;
+                                    DownloadManager.getInstance().subtractPoints(apiKey, 100);
+                                }
+
+                                if(distance < CATCH_DISTANCE && user.hunter && friend.getBoolean("hunter")){
+                                    Toast.makeText(GameActivity.this, "Just another hunter...", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         }
                     } catch (JSONException e) {
@@ -205,7 +377,8 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 @Override
                                 public void run() {
                                     addSafeZones();
-                                    if(enabled){
+                                    loadedSafeZones = true;
+                                    if (enabled) {
                                         DownloadManager.getInstance().getFriendsLocation(apiKey);
                                     }
                                 }
@@ -215,6 +388,35 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                }
+
+                if (state == 4) {
+                    state = 1;
+                    DownloadManager.getInstance().getFriendsLocation(apiKey);
+                }
+
+                if (state == 5){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            countdownStarted = false;
+                            countdown();
+                        }
+                    });
+                }
+
+                if(state == 7){
+                    state = 8;
+                    DownloadManager.getInstance().setInactive(apiKey);
+                }
+
+                if(state == 8){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                        inactiveCountdown();
+                        }
+                    });
                 }
 
             }
@@ -243,10 +445,22 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (!enabled) {
-            ConstraintLayout constraintLayout = (ConstraintLayout) findViewById(R.id.constraint_layout);
             snackbar = Snackbar.make(constraintLayout, getString(R.string.turn_on_location), Snackbar.LENGTH_INDEFINITE);
             snackbar.show();
+            snackbarShown = true;
         }
+
+        hunterIcon = (ImageView) findViewById(R.id.hunter_icon);
+        if (user.hunter) {
+            hunterIcon.setImageResource(R.drawable.hunter);
+            hunterIcon.setColorFilter(R.color.red);
+        } else {
+            hunterIcon.setImageResource(R.drawable.regular);
+            hunterIcon.setColorFilter(R.color.yellow);
+        }
+
+        points = (TextView) findViewById(R.id.points);
+        points.setText("Points: " + user.points);
 
         state = 2;
         DownloadManager.getInstance().getFriendsSafeZones(apiKey);
@@ -315,5 +529,30 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
         float dist = (float) (earthRadius * c);
 
         return dist;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        backgroundService = new Intent(GameActivity.this, BackgroundService.class);
+        backgroundService.putExtra("api", apiKey);
+        backgroundService.putExtra("miliseconds", miliseconds);
+
+        if (!isMyServiceRunning(BackgroundService.class)) {
+            startService(backgroundService);
+        }
+
+        System.gc();
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

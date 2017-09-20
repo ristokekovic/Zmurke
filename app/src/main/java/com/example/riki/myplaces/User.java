@@ -1,10 +1,12 @@
 package com.example.riki.myplaces;
 
+import java.io.Serializable;
+
 /**
  * Created by Riki on 8/21/2017.
  */
 
-public class User {
+public class User implements Serializable{
     public String firstName;
     public String lastName;
     public String email;

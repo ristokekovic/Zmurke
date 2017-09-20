@@ -36,9 +36,6 @@ import org.json.JSONObject;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-/**
- * Created by Riki on 8/16/2017.
- */
 
 public class BackgroundService extends Service implements LocationListener, IThreadWakeUp {
 
@@ -158,7 +155,7 @@ public class BackgroundService extends Service implements LocationListener, IThr
             //TODO: Requests for the server
 
             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            DownloadManager.getInstance().addLocation((float)location.getLatitude(), (float)location.getLongitude(), apiKey);
+            //DownloadManager.getInstance().addLocation((float)location.getLatitude(), (float)location.getLongitude(), apiKey);
 
             DownloadManager.getInstance().getFriendsLocation(apiKey);
 

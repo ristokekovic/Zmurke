@@ -301,7 +301,7 @@ public class MyPlacesMapActivity extends AppCompatActivity implements OnMapReady
         timer++;
         LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
         state = 2;
-        DownloadManager.getInstance().addLocation((float)location.getLatitude(), (float)location.getLongitude(), apiKey);
+        //DownloadManager.getInstance().addLocation((float)location.getLatitude(), (float)location.getLongitude(), apiKey);
         if(timer == 10){
             map.clear();
             state = 1;

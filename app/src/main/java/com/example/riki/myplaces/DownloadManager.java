@@ -313,7 +313,7 @@ public class DownloadManager {
         t.start();
     }
 
-    public void addLocation(final float latitude, final float longitude, final String apiToken)
+    public void addLocation(final float latitude, final float longitude, final boolean inSafeZone, final String apiToken)
     {
         Thread t = new Thread(new Runnable() {
             @Override
@@ -322,6 +322,7 @@ public class DownloadManager {
                     RequestBody formBody = new FormBody.Builder()
                             .add("latitude", String.valueOf(latitude))
                             .add("longitude", String.valueOf(longitude))
+                            .add("in_safe_zone", String.valueOf(inSafeZone))
                             .build();
                     Request request = new Request.Builder()
                             .url("https://zmurke.herokuapp.com/api/location")
@@ -489,6 +490,115 @@ public class DownloadManager {
                     String s = response.body().string();
                     wakeUp.ResponseOk(s);
                 } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+    public void addPoints(final String apiToken, final int points)
+    {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    RequestBody formBody = new FormBody.Builder()
+                            .add("points", String.valueOf(points))
+                            .build();
+                    Request request = new Request.Builder()
+                            .url("https://zmurke.herokuapp.com/api/user/points/add")
+                            .post(formBody)
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+    public void subtractPoints(final String apiToken, final int points)
+    {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    RequestBody formBody = new FormBody.Builder()
+                            .add("points", String.valueOf(points))
+                            .build();
+                    Request request = new Request.Builder()
+                            .url("https://zmurke.herokuapp.com/api/user/points/subtract")
+                            .post(formBody)
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+    public void setActive(final String apiToken)
+    {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    RequestBody formBody = new FormBody.Builder()
+                            .build();
+                    Request request = new Request.Builder()
+                            .url("https://zmurke.herokuapp.com/api/user/active")
+                            .post(formBody)
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+    public void setInactive(final String apiToken)
+    {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    RequestBody formBody = new FormBody.Builder()
+                            .build();
+                    Request request = new Request.Builder()
+                            .url("https://zmurke.herokuapp.com/api/user/inactive")
+                            .post(formBody)
+                            .addHeader("api", apiToken)
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+                    String s = response.body().string();
+                    wakeUp.ResponseOk(s);
+                }
+                catch (IOException e)
+                {
                     e.printStackTrace();
                 }
             }
