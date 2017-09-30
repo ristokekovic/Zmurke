@@ -52,7 +52,7 @@ public class ProfileActivity extends AppCompatActivity implements IThreadWakeUp 
     boolean updated = false;
     final int PICK_IMAGE = 100;
     EditText firstname, lastname, username1, email1, phone;
-    String firstn, lastn, phonen;
+    String firstn, lastn, phonen, iduser;
     String apiKey;
     String encodedImage;
     ImageView buttonphoto;
@@ -90,14 +90,24 @@ public class ProfileActivity extends AppCompatActivity implements IThreadWakeUp 
 
             public void onClick(View v) {
 
-                if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                        PackageManager.PERMISSION_GRANTED) {
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                    if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                            PackageManager.PERMISSION_GRANTED) {
+                        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                        photoPickerIntent.setType("image/*");
+                        startActivityForResult(photoPickerIntent, PICK_IMAGE);
+                    } else {
+                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                1);
+                    }
+                }
+                else {
+
                     Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
                     photoPickerIntent.setType("image/*");
                     startActivityForResult(photoPickerIntent, PICK_IMAGE);
-                } else {
-                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            1);
+
                 }
             }
         });
@@ -108,10 +118,10 @@ public class ProfileActivity extends AppCompatActivity implements IThreadWakeUp 
         button1.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
-                button1.startAnimation(animation);
-                Intent intent = new Intent(ProfileActivity.this, PasswordActivity.class);
-                intent.putExtra("api", apiKey);
-                intent.putExtra("email", userMail);
+
+                Intent intent = new Intent(ProfileActivity.this,RankingActivity.class);
+                intent.putExtra("api",apiKey);
+                intent.putExtra("id",iduser);
                 startActivity(intent);
 
 
@@ -477,6 +487,7 @@ public class ProfileActivity extends AppCompatActivity implements IThreadWakeUp 
                                 String lastName = reader.getString("last_name");
                                 String phoneNumber = reader.getString("phone_number");
                                 String urlImage = reader.getString("avatar");
+                                iduser = reader.getString("id");
                                 firstname = (EditText) findViewById(R.id.firstnameT);
                                 if (firstName != "null")
                                     firstname.setText(firstName);

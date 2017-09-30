@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+
+    >
+
+    <ListPreference
+        android:title="Interface language"
+        android:summary="Changes the language this app uses"
+        android:key="language"
+        android:defaultValue="1"
+        android:entries="@array/listLanguages"
+        android:entryValues="@array/listLanguagesValues" />
+
+    <Preference
+        android:title="Change password"
+        android:summary="Click here in order to change your password">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.riki.myplaces"
+            android:targetClass="com.example.riki.myplaces.PasswordActivity"
+            />
+    </Preference>
+
+    <Preference
+        android:title="nemam"
+        android:summary="ne znam"
+        android:key="importExportDatabase">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.riki.myplaces"
+            android:targetClass="com.example.riki.myplaces.popup.ImportExport"
+            />
+
+    </Preference>
+
+
+    <Preference
+        android:title="nesto"
+        android:summary="nesto">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.riki.myplaces"
+            android:targetClass="com.example.riki.myplaces.popup.popup_developers"
+            />
+    </Preference>
+
+
+</PreferenceScreen>

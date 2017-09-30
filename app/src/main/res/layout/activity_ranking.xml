@@ -238,7 +238,7 @@
         android:layout_height="97dp"
         app:srcCompat="@drawable/trophy"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="-165dp"
         app:layout_constraintRight_toLeftOf="@+id/textView22"
         app:layout_constraintLeft_toRightOf="@+id/textView21" />
 
@@ -248,7 +248,7 @@
         android:layout_height="37dp"
         android:text="Player"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="52dp"
+        android:layout_marginTop="-129dp"
         android:layout_marginLeft="8dp"
         android:gravity="center"
         android:textColor="@color/colorBlack"
@@ -269,7 +269,7 @@
         android:gravity="center"
         android:textColor="@color/colorBlack"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="52dp"
+        android:layout_marginTop="-129dp"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/imageView9"
@@ -308,5 +308,16 @@
         android:id="@+id/guideline5"
         app:layout_constraintGuide_begin="252dp"
         android:orientation="vertical" />
+
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        tools:layout_editor_absoluteY="490dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

@@ -13,7 +13,11 @@
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <permission
+        android:name="android.permission.INTERACT_ACROSS_USERS_FULL"
+        android:protectionLevel="signature" />
 
     <!--
      The following two permissions are not required to use
@@ -21,6 +25,8 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <permission
         android:name="com.example.riki.myplaces.permission.MAPS_RECEIVE"
@@ -87,7 +93,8 @@
         <activity
             android:name=".RankingActivity"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
-        <activity android:name=".FriendsActivity"
+        <activity
+            android:name=".FriendsActivity"
             android:label="Your friends" />
         <activity
             android:name=".PlayActivity"
@@ -105,7 +112,20 @@
         <activity
             android:name=".FriendProfileActivity"
             android:theme="@style/AppTheme.CustomTheme" />
-        <activity android:name=".GameActivity"></activity>
+        <activity android:name=".GameActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+        <activity android:name=".BluetoothActivity" />
+        <activity android:name=".DeviceListActivity" />
+        <activity android:name=".DeviceListAdapter" />
+        <activity android:name=".BlueActivity" />
+        <activity
+            android:name=".DeviceListActivity1"
+            android:label="@string/select_device"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.DeviceDefault.Light.Dialog" />
+        <activity android:name=".Friendz"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+        <activity android:name=".HelpActivity" />
     </application>
 
 </manifest>
