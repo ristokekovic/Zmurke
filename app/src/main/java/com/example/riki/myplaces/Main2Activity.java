@@ -24,6 +24,7 @@ public class Main2Activity extends AppCompatActivity implements IThreadWakeUp {
 
     boolean clickEnabled;
     User user;
+    String ajdi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,11 +91,14 @@ public class Main2Activity extends AppCompatActivity implements IThreadWakeUp {
 
             public void onClick(View v) {
                 v1.startAnimation(animation);
-                Intent map = new Intent(Main2Activity.this, MyPlacesMapActivity.class);
+            /*    Intent map = new Intent(Main2Activity.this, MyPlacesMapActivity.class);
                 map.putExtra("state", MyPlacesMapActivity.SELECT_COORDINATES);
                 map.putExtra("api", apiKey);
                 map.putExtra("safe_zone", user.safeZone);
-                startActivityForResult(map,1);
+                startActivityForResult(map,1);*/
+
+                Intent intent = new Intent(Main2Activity.this,HelpActivity.class);
+                startActivity(intent);
 
 
             }
@@ -128,8 +132,14 @@ public class Main2Activity extends AppCompatActivity implements IThreadWakeUp {
 
             public void onClick(View v) {
                 v4.startAnimation(animation);
+
+                String a = String.valueOf(user.id);
                 Intent intent = new Intent(Main2Activity.this,RankingActivity.class);
+                intent.putExtra("api",apiKey);
+                intent.putExtra("id",ajdi);
                 startActivity(intent);
+
+
 
             }
         });
@@ -140,7 +150,7 @@ public class Main2Activity extends AppCompatActivity implements IThreadWakeUp {
             public void onClick(View v) {
 
                 v5.startAnimation(animation);
-                Intent intent = new Intent(Main2Activity.this,FriendsActivity.class);
+                Intent intent = new Intent(Main2Activity.this,Friendz.class);
                 intent.putExtra("api", apiKey);
                 startActivity(intent);
             }
@@ -181,7 +191,10 @@ public class Main2Activity extends AppCompatActivity implements IThreadWakeUp {
             }
             else {
                 try{
+
+
                     JSONObject data = new JSONObject(s);
+                    ajdi = data.getString("id");
                     int currentLocation = data.getString("current_location") != null ? data.getInt("current_location") : 0;
                     //String gm = data.getString("current_game");
                     int currentGame = !data.getString("current_game").equals("null") ? data.getInt("current_game") : 0;
@@ -200,6 +213,7 @@ public class Main2Activity extends AppCompatActivity implements IThreadWakeUp {
                             hunter,
                             points
                     );
+
 
                 } catch (JSONException e){
                     e.printStackTrace();
