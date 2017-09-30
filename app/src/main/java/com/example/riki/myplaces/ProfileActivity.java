@@ -119,9 +119,9 @@ public class ProfileActivity extends AppCompatActivity implements IThreadWakeUp 
 
             public void onClick(View v) {
 
-                Intent intent = new Intent(ProfileActivity.this,RankingActivity.class);
+                Intent intent = new Intent(ProfileActivity.this,PasswordActivity.class);
                 intent.putExtra("api",apiKey);
-                intent.putExtra("id",iduser);
+                intent.putExtra("email",userMail);
                 startActivity(intent);
 
 
