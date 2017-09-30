@@ -3,6 +3,7 @@ package com.example.riki.myplaces;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -23,7 +24,9 @@ public class FriendsActivity extends AppCompatActivity implements IThreadWakeUp 
     ArrayList<String> listItems=new ArrayList<String>();
     ArrayAdapter<String> adapter;
     String apiKey;
+    String idUser;
     boolean ok = false;
+    boolean notOk = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,8 +35,10 @@ public class FriendsActivity extends AppCompatActivity implements IThreadWakeUp 
         apiKey = intent.getExtras().getString("api");
         DownloadManager.getInstance().setThreadWakeUp(this);
 
-        //listItems.add("Kao prijatelji");
-        //listItems.add("hehehe");
+
+
+
+
         ListView friends = (ListView) findViewById(R.id.listViewFriends);
         friends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -62,6 +67,23 @@ public class FriendsActivity extends AppCompatActivity implements IThreadWakeUp 
         friends.setAdapter(adapter);
 
         DownloadManager.getInstance().getFriends(apiKey);
+        DownloadManager.getInstance().getUser(apiKey);
+
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabAddNewFriend);
+        fab.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+              //  logOut.startAnimation(animation);
+                Intent intent = new Intent(FriendsActivity.this, Friendz.class);
+                intent.putExtra("api",apiKey);
+               //intent.putExtra("id",idUser);
+                startActivity(intent);
+
+            }
+        });
+
+
+
     }
 
     @Override
@@ -139,6 +161,12 @@ public class FriendsActivity extends AppCompatActivity implements IThreadWakeUp 
 
                     }
                     else {
+                        if(notOk) {
+                            JSONObject reader = new JSONObject(s);
+                            idUser = reader.getString("id");
+                            notOk= false;
+                        }
+
                         JSONArray friends = new JSONArray(s);
                         JSONObject[] elements = new JSONObject[friends.length()];
                         final String[] names = new String[friends.length()];
